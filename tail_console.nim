@@ -1,9 +1,9 @@
-####################################################
+#                                                  #
 # Under MIT License                                #
 # Author: (c) 2020 Oples                           #
 # Original repo can be found at:                   #
 #      https://github.com/Oples/tf2-stats          #
-####################################################
+#                                                  #
 
 import os
 import re
@@ -12,11 +12,10 @@ import json
 import times
 import deques
 import strutils
+from get_path import get_tf2_path
 
-let file_path = "console.log"
-var file_size = (int64) 0
-var f = open(file_path)
-# Close the file object when you are done with it
+
+
 var OWNER = "Oples"
 var OWNER_kills = 0
 var OWNER_deaths = 0
@@ -30,17 +29,16 @@ proc oscillate(num: int):int =
   else:
     return num + 1 # team B
 
-
-######################
-# Team Balance class #
-######################
+##
+## Team Balance class
+##
 type
   TeamBalance = ref object
     time: Time
 
-###################
-#   Player class  #
-###################
+##
+##   Player class
+##
 type
   Player = ref object
     name: string
@@ -105,7 +103,7 @@ method newDeath(self: var Player, player: var Player) {.base.} =
 
 method newKill(self: var Player, player: var Player) {.base.} =
   player.newDeath(self)
-  echo "FLOOR MOD ", len(self.team_switch),"  ", (floorMod(len(self.team_switch), 2) == 0)
+  #echo "FLOOR MOD ", len(self.team_switch),"  ", (floorMod(len(self.team_switch), 2) == 0)
   if floorMod(len(self.team_switch), 2) == floorMod(len(player.team_switch), 2):
     if not self.kills.contains(player):
       self.kills.add(player)
@@ -229,9 +227,9 @@ method updatePropagate(self: var Player):bool {.base.} =
 method copy(self: Player) {.base.} =
   discard
 
-###################
-#    chat class   #
-###################
+##
+##   chat class
+##
 type
   Chat = ref object
     time: Time
@@ -261,9 +259,9 @@ method toJson(self: Chat): JsonNode {.base.} =
   return json_node
 
 
-###################
-#   Weapon class  #
-###################
+##
+##  Weapon class
+##
 type
   Weapon = ref object
     str: string
@@ -279,9 +277,9 @@ proc newWeapon(str: string): Weapon =
   return weapon
 
 
-###################
-#    Kill class   #
-###################
+##
+##   Kill class
+##
 type
   Kill = ref object
     time: Time
@@ -290,6 +288,7 @@ type
     target: Player
     target_side: bool
     weapon: Weapon
+    crit: bool
 
 method toJson(self: Kill): JsonNode {.base.} =
   var json_node = newJObject()
@@ -299,20 +298,21 @@ method toJson(self: Kill): JsonNode {.base.} =
   json_node.add("target", newJString(self.target.name))
   json_node.add("target_side", newJBool(self.target_side))
   json_node.add("weapon", newJString(self.weapon.name))
+  json_node.add("crit", newJBool(self.crit))
   return json_node
 
 
-###################
-#   Match class   #
-###################
+##
+##  Match class
+##
 
-#[ Match
+##[ Match
 default:
   side: false
     side A (odd numbers) = RED
     side B (even numbers) = BLU
   side: true
-]#
+]##
 type
   Match = ref object
     ip: string
@@ -363,20 +363,25 @@ method addPlayer(self: var Match, player_name: string): Player {.base.} =
   self.players.add(new_player)
   return new_player
 
-method addKill(self: var Match, subject: string, target: string, weapon: Weapon) {.base.} =
+method addKill(self: var Match, subject: string, target: string, weapon: Weapon, crit: bool) {.base.} =
 
   var subj_p = self.addPlayer(subject)
   var subj_p_side = false
-  if not floorMod(len(subj_p.team_switch),2) == 0:
+
+  if not len(subj_p.team_switch) mod 2 == 0:
     subj_p_side = true
+
   var subj_t = self.addPlayer(target)
   var subj_t_side = false
-  if not floorMod(len(subj_t.team_switch),2) == 0:
+
+  if not len(subj_t.team_switch) mod 2 == 0:
     subj_t_side = true
-  var new_kill = Kill(time: getTime(),
+
+  var new_kill = Kill(
+    time: getTime(),
     subject: subj_p, subject_side: subj_p_side,
     target: subj_t, target_side: subj_t_side,
-    weapon: weapon)
+    weapon: weapon, crit: crit)
 
   subj_p.newKill(subj_t)
   self.kills.add(new_kill)
@@ -406,9 +411,9 @@ method printChat(self: Match) {.base.} =
     echo pretty(msg.toJson())
 
 
-###################
-#    Game class   #
-###################
+##
+##   Game class
+##
 type
   Game = ref object
     match: seq[Match]
@@ -439,8 +444,6 @@ proc saveJSON(json_par:JsonNode, file_path:string) =
       msg = getCurrentExceptionMsg()
     echo("ERROR: ", repr(e), " with ", msg)
 
-# repr
-
 
 #[proc print_console (line: string) =
   if line =~ re"(.*) selected":
@@ -448,6 +451,7 @@ proc saveJSON(json_par:JsonNode, file_path:string) =
 
 
 
+# GLOBAL VARIABLES (shame ;-;)
 var connecting = 0
 var map = ""
 var players = 0
@@ -459,6 +463,7 @@ var mm_id = ""
 var n_friends = 0
 var tf2 = newGame()
 var match = cast[Match](nil)
+
 
 proc update_info(line: string, print: bool) =
 
@@ -503,7 +508,7 @@ proc update_info(line: string, print: bool) =
       flag_new_game = false
 
   elif line =~ re"^(.*) killed (.*) with (.*?)\.( \(crit\))*$":
-    match.addKill(matches[0], matches[1], newWeapon(matches[2]))
+    match.addKill(matches[0], matches[1], newWeapon(matches[2]), matches[3] != "")
     if matches[0] == OWNER:
       OWNER_kills += 1
       if print:
@@ -529,14 +534,14 @@ proc update_info(line: string, print: bool) =
       OWNER_deaths += 1
 
   elif line =~ re"(.*) selected":
-    echo("CLASS: ", matches[0])
+    if print: echo("CLASS: ", matches[0])
 
   elif line == "":
     discard
 
   elif line == "Client reached server_spawn." and connecting == 5:
     connecting += 1
-    echo "CONNECTED TO SERVER"
+    if print: echo "CONNECTED TO SERVER"
   elif line =~ re"^Recognizing MM server id (\[.*\])$" and connecting >= 5:
     connecting += 1
     mm_id = matches[0]
@@ -556,7 +561,7 @@ proc update_info(line: string, print: bool) =
   elif line =~ re"^(?:.*[SM].*? ){0,1}(.*) has been changed to (.*) to balance the teams.$":
     var player = match.addPlayer(matches[0])
     player.switchSide()
-    echo matches[0], " ", matches[1]
+    if print: echo matches[0], " ", matches[1]
 
   elif line =~ re"^(?:.*[SM].*? ){0,1}(.*) was moved to the other team for game balance$":
     var player = match.addPlayer(matches[0])
@@ -623,9 +628,11 @@ proc update_info(line: string, print: bool) =
   elif line == "Sending request to abandon current match":
     if print:
       echo "MATCH END #1"
+
   elif line == "Disconnecting from abandoned match server":
     if print:
       echo "MATCH END #2"
+
   elif line == "Sending request to exit matchmaking, marking assigned match as ended":
     saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
     if print:
@@ -639,11 +646,11 @@ proc update_info(line: string, print: bool) =
       var team = parseInt(matches[2])
       if print: echo "PLAYER: ", player.name, " OF TEAM ",player.team," IS:"
 
-      echo "/////////////////////////////////////////////////////////////////////////////////"
-      echo "team len(player.team_switch) ", len(player.team_switch)
+      if print: echo "/////////////////////////////////////////////////////////////////////////////////"
+      if print: echo "team len(player.team_switch) ", len(player.team_switch)
       #echo "player: ", pretty(player.toJson())
       if print: echo "PLAYER: ", player.name, " OF TEAM ",player.team," IS:"
-      if not (floorMod(len(player.team_switch), 2) == 0):
+      if not (len(player.team_switch) mod 2 == 0):
         if team == 2:
           team = 3
         if team == 3:
@@ -687,27 +694,41 @@ proc update_info(line: string, print: bool) =
 
   #echo ""
 
-while true:
-  var firstLine = ""
 
-  try:
-    if f.endOfFile():
-      f.flushFile()
-      file_pos = getFilePos(f)
-      if f.getFileSize() < file_size:
-        file_pos = 0
-      f.setFilePos(file_pos)
-      sleep(10)
-    else:
-      firstLine = f.readLine()
-      file_size = f.getFileSize()
-  except IOError:
-    discard
+proc main() =
+  var file_path = get_tf2_path()
+  var file_size = (int64) 0
 
-  if firstLine != "":
-    let line = firstLine
-    #echo firstLine  # prints Spitfire
-    #print_console(line)
-    update_info(line, true)
+  if file_path == "":
+    echo "error"
 
-f.close()
+  var f = open(file_path)
+  # Close the file object when you are done with it
+
+  while true:
+    var firstLine = ""
+
+    try:
+      if f.endOfFile():
+        f.flushFile()
+        file_pos = getFilePos(f)
+        if f.getFileSize() < file_size:
+          file_pos = 0
+        f.setFilePos(file_pos)
+        sleep(10)
+      else:
+        firstLine = f.readLine()
+        file_size = f.getFileSize()
+    except IOError:
+      discard
+
+    if firstLine != "":
+      let line = firstLine
+      #print_console(line)
+      update_info(line, true)
+
+  f.close()
+
+
+when isMainModule:
+  main()
