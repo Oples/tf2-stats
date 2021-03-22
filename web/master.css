@@ -1,0 +1,33 @@
+.bg-img {
+  /*background-image: url(https://cdn.pixabay.com/photo/2013/07/21/13/00/rose-165819_960_720.jpg);*/
+  background: rgb(41,52,70);
+  background: -moz-repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
+  background: -webkit-repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
+  background: repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
+}
+.near-white {
+  color: #CACACA;
+}
+.near-near-white {
+  color: #DEDEDE;
+}
+.bg-dark-gray {
+  background-color: #272425;
+}
+.bg-mid-gray {
+  background-color: #333333;
+}
+@media screen and (max-width: 60em) {
+  .mw-90 {
+    max-width: 90%;
+  }
+}
+.list-mv1 > li {
+  margin: 0.4em;
+}
+.bg-dark-red {
+  background-color: #A40909;
+}
+.link {
+  transition: unset !important;
+}

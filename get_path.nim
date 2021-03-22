@@ -33,7 +33,6 @@ proc getCustomConsoleLogPath*(): string =
 proc getTF2Path*(): string =
     var
         steamLauncherInstallPath: string
-        steamInstallDir: string
         steamPossibleLibraries : seq[string]
     let
         SteapApps = "steamapps"
@@ -44,6 +43,7 @@ proc getTF2Path*(): string =
     logger.log(lvlInfo, "Trying to search for the Team Fortress 2 directory")
 
     when defined(windows):
+        var steamInstallDir: string
         # get hw key
         # https://github.com/coalpha/lang-archives/blob/master/nim/steam_install.nim
         # ty coalpha

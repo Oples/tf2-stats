@@ -175,7 +175,6 @@ method propagateTeams(self: var Player): bool {.base.} =
                 visited.add(p)
                 queue.addFirst(p)
 
-
     return true
 
 method updatePropagate(self: var Player):bool {.base.} =
@@ -366,7 +365,6 @@ method addPlayer(self: var Match, player_name: string): Player {.base.} =
     return new_player
 
 method addKill(self: var Match, subject: string, target: string, weapon: Weapon, crit: bool) {.base.} =
-
     var subj_p = self.addPlayer(subject)
     var subj_p_side = false
 
@@ -476,9 +474,10 @@ var match = cast[Match](nil)
 proc update_info(line: string, print: bool) =
     var m: RegexMatch
 
-    if line.match(re"^Connecting to (.*)(?:\.\.\.){0,1}$", m):
+    if line.match(re"^Connecting to (.*?)(?:\.\.\.){0,1}$", m):
         server_ip = m.groupFirstCapture(0, line)
         echo "CONNECTING TO: ", server_ip
+        n_friends = 0
 
     elif line == "Team Fortress":
         echo "New server connecting..."
@@ -512,8 +511,7 @@ proc update_info(line: string, print: bool) =
             p.team = 1
         if OWNER == "" and flag_new_game:
             OWNER = m.groupFirstCapture(0, line)
-            if print:
-                echo(OWNER," IS NOW MY OWNER")
+            logger.log(lvlInfo, OWNER," IS NOW MY OWNER")
             flag_new_game = false
 
     elif line.match(re"^(.*) killed (.*) with (.*?)\.( \(crit\))*$", m):
@@ -531,12 +529,6 @@ proc update_info(line: string, print: bool) =
         )
         if sName == OWNER:
             OWNER_kills += 1
-            if print:
-                echo OWNER, " kills total: ", OWNER_kills
-                echo("Subject: ", sName)
-                echo("Target: ", tName)
-                echo("Weapon: ",weapon)
-                echo("Crit?: ", crit)
 
         if tName == OWNER:
             OWNER_deaths += 1
@@ -691,14 +683,14 @@ proc update_info(line: string, print: bool) =
         var team = parseInt(m.groupFirstCapture(2, line))
 
         var players = pNames.split(", ")
+
+        logger.log(lvlInfo, "/////////////////////////////////////////////////////////////////////////////////")
         for player_name in players:
             var player = match.addPlayer(player_name)
-            if print: echo "PLAYER: ", player.name, " OF TEAM ",player.team," IS:"
 
-            if print: echo "/////////////////////////////////////////////////////////////////////////////////"
             if print: echo "team len(player.team_switch) ", len(player.team_switch)
             #echo "player: ", pretty(player.toJson())
-            if print: echo "PLAYER: ", player.name, " OF TEAM ",player.team," IS:"
+            logger.log(lvlInfo, "PLAYER: ", player.name, " OF TEAM ",player.team," IS:")
             if not (len(player.team_switch) mod 2 == 0):
                 if team == 2:
                     team = 3
