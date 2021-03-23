@@ -31,3 +31,9 @@
 .link {
   transition: unset !important;
 }
+* {
+  scrollbar-color: #42474a #1b1e1f;
+}
+.fg1 {
+  flex-grow: 1;
+}
