@@ -1,0 +1,10 @@
+
+Index.html / History
+   |
+   - Real Time
+   |
+   - map#ID.html / Map history list
+      |
+      - Map info
+      |
+      - Players info
