@@ -1,26 +1,25 @@
 .bg-img {
   /*background-image: url(https://cdn.pixabay.com/photo/2013/07/21/13/00/rose-165819_960_720.jpg);*/
-  background: rgb(41,52,70);
-  background: -moz-repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
+  background: rgb(143,33,36);
+  /*background: -moz-repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
   background: -webkit-repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
-  background: repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);
+  background: repeating-linear-gradient(48deg, rgba(41,52,70,1) 25em, rgba(143,33,36,1)  25em, rgba(143,33,36,1)  50em, rgba(41,52,70,1) 50em, rgba(41,52,70,1) 75em, rgba(143,33,36,1) 75em);*/
+  background: linear-gradient(0deg, rgb(143,33,36) 0%, rgb(41,52,70) 90%);
 }
-.near-white {
-  color: #CACACA;
-}
-.near-near-white {
-  color: #DEDEDE;
-}
-.bg-dark-gray {
-  background-color: #272425;
-}
-.bg-mid-gray {
-  background-color: #333333;
-}
+.near-white {color: #CACACA;}
+.near-near-white {color: #DEDEDE;}
+
+.bg-dark-gray {background-color: #272425;}
+.bg-mid-gray {background-color: #333333;}
+
+.orange {color: #eba73e;}
+.bg-orange {background-color: #eba73e;}
+
+.dark-orange {color: #9d5422;}
+.bg-dark-orange {background-color: #9d5422;}
+
 @media screen and (max-width: 60em) {
-  .mw-90 {
-    max-width: 90%;
-  }
+  .mw-90 {max-width: 90%;}
 }
 .list-mv1 > li {
   margin: 0.4em;
@@ -36,4 +35,39 @@
 }
 .fg1 {
   flex-grow: 1;
+}
+.overflow-break-word {
+  overflow-wrap: break-word;
+}
+.wrapword {
+  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+  white-space: -pre-wrap; /* Opera  4-6 */
+  white-space: -o-pre-wrap; /* Opera 7 */
+  white-space: pre-wrap; /* css-3 */
+  word-wrap: break-word; /* Internet Explorer 5.5+ */
+  white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
+  word-break: break-all;
+  white-space: normal;
+}
+
+.transition-h4 {
+  max-height: 18rem;
+  transition: max-height 0.7s;
+}
+
+.stripe-dark-list > *:nth-child(odd) {
+  background-color: rgba(0,0,0,.1);
+}
+
+@media screen and (min-width: 60em) {
+  .child-bg-art {
+    background-image: url(specific_data_bg-min.svg);
+    background-size: cover;
+    background-repeat: no-repeat;
+  }
+}
+
+.h0 {
+  max-height: 0;
+  /*display: none;*/
 }

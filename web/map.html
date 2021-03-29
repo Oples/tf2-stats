@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<!--
+	Copyright (c) 2021 Copyright Holder All Rights Reserved.
+-->
+<html lang="en" dir="ltr" class="h-100">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#293446">
+		<!-- Add to homescreen -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="description" content="tf2 hats gen?">
+		<meta name="author" content="Oples">
+		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
+		<title>TF2 Stats</title>
+		<link rel="stylesheet" href="tachyons.min.css">
+		<link rel="stylesheet" href="animate.min.css">
+		<link rel="stylesheet" href="master.css">
+	</head>
+
+	<body class="sans-serif near-white cover h-100">
+		<div class="flex bg-img flex-column min-h-100">
+			<div class="mw-90 mw8-l center pv3 fg1" role="main">
+				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+					<div id="title-header" class="dt-ns dt--fixed w-100">
+						<div class="dtc-l">
+							<h1 class="fw10 f2 truncate near-near-white mv1">
+								mvm_2fort_nasuds_Sdubdc_trainsawtrainmeelhighertower
+							</h1>
+						</div>
+						<div class="dtc-l">
+							<h2 class="f3 fw1 tr mv1 truncate">battle history LAYKEEN WAZ HERE</h2>
+						</div>
+					</div>
+
+					<div class="bg-white mv2" style="height:2px"></div>
+
+					<div class="center">
+						<label for="filter">Filter:</label>
+						<input class="input-reset ba b--black-20 pa2 db w-100 bg-mid-gray near-white" type="text" name="filter">
+					</div>
+
+					<div class="dt dt--fixed">
+						<div class="dt-row">
+							<div class="dtc-l">
+								<div class="ma1-l">
+									<div class="bg-mid-gray pa3 br2 mt3">
+										<div class="dt w-100 dt--fixed mb3">
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Name
+												</div>
+												<div class="dtc truncate">
+													: <label class="white">Oples</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Team
+												</div>
+												<div class="dtc">
+													: <label class="red b">RED</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													K/D Ratio
+												</div>
+												<div class="dtc">
+													: <label>-1 sadge</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Crit%
+												</div>
+												<div class="dtc">
+													: <label>1%</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Weapon&#9733;
+												</div>
+												<div class="dtc">
+													: <label>Sentry</label>
+												</div>
+											</div>
+										</div>
+
+										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(1, boxType.CHAT);">Chat</button>
+										<div class="fr">
+											<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(1, boxType.KILL);">Kills</button>
+										</div>
+									</div>
+									<div id="chatHistory_1" class="overflow-hidden h0">
+										<div class="child-bg-art pt2 ml1-l pl2-l">
+											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+												<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+													<div class="pa0 ma0 stripe-dark-list">
+														<!-- Remember to rstrip -->
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
+														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
+														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="killHistory_1" class="overflow-hidden h0">
+										<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
+											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+											<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+												<div class="pa0 ma0 stripe-dark-list">
+													<!-- Remember to rstrip -->
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												</div>
+											</div>
+										</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="dtc-l">
+								<div class="ma1-l">
+									<div class="bg-mid-gray pa3 br2 mt3">
+										<div class="dt w-100 dt--fixed mb3">
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Name
+												</div>
+												<div class="dtc truncate">
+													: <label class="white">Oples</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Team
+												</div>
+												<div class="dtc">
+													: <label class="red b">RED</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													K/D Ratio
+												</div>
+												<div class="dtc">
+													: <label>-1 sadge</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Crit%
+												</div>
+												<div class="dtc">
+													: <label>1%</label>
+												</div>
+											</div>
+											<div class="dt-row">
+												<div class="dtc b pt1">
+													Weapon&#9733;
+												</div>
+												<div class="dtc">
+													: <label>Sentry</label>
+												</div>
+											</div>
+										</div>
+
+										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(2, boxType.CHAT);">Chat</button>
+										<div class="fr">
+											<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(2, boxType.KILL);">Kills</button>
+										</div>
+									</div>
+									<div id="chatHistory_2" class="overflow-hidden h0">
+										<div class="child-bg-art pt2 ml1-l pl2-l">
+											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+												<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+													<div class="pa0 ma0 stripe-dark-list">
+														<!-- Remember to rstrip -->
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
+														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
+														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
+														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
+														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="killHistory_2" class="overflow-hidden h0">
+										<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
+											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+											<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+												<div class="pa0 ma0 stripe-dark-list">
+													<!-- Remember to rstrip -->
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												</div>
+											</div>
+										</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="bg-mid-gray mt3 mb2" style="height:2px"></div>
+				</div>
+			</div>
+
+			<footer class="bg-dark-gray white-80 pv4 ph5">
+				<div class="f5">
+					<div class="dib mb2 mb0-l">
+						This project is under the
+						<a rel="license" href="https://mit-license.org/" class="link light-blue">
+							MIT License
+						</a>
+					</div>
+					<div class="fr-l">
+						<a href="https://github.com/Oples/tf2-stats" class="link light-blue">TF2 Stats GitHub</a>
+					</div>
+				</div>
+			</footer>
+		</div>
+  	<script src="fun.js" charset="utf-8"></script>
+	</body>
+</html>
