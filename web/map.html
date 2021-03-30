@@ -23,7 +23,7 @@
 			<div class="mw-90 mw8-l center pv3 fg1" role="main">
 				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
 					<div id="title-header" class="dt-ns dt--fixed w-100">
-						<div class="dtc-l">
+						<div class="dtc-l w-75-l">
 							<h1 class="fw10 f2 truncate orange mv1">mvm_2fort_nasuds_Sdubdc_trainsawtrainmeelhighertower</h1>
 						</div>
 						<div class="dtc-l">
@@ -38,7 +38,7 @@
 						<input class="input-reset ba b--black-20 pa2 db w-100 bg-mid-gray near-white" type="text" name="filter" placeholder="Filter by players' name..." onkeyup="filterPlayersList(this.value, filterType.NAME)">
 					</div>
 
-					<ul class="ma0 pa0 list flex" id="players_list">
+					<ul class="ma0 pa0 list db flex-l" id="players_list">
 						<li class="w-100 w-50-l">
 							<div class="ma2">
 								<div class="bg-mid-gray pa3 br2">
@@ -236,6 +236,48 @@
 					</ul>
 
 					<div class="bg-mid-gray mt3 mb2" style="height:2px"></div>
+				</div>
+
+				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+					<div class="bg-mid-gray pa2">
+						<div class="mv1">
+							<h2 class="f3 fw1 mv1 truncate">Current match graphs:</h2>
+						</div>
+						<div class="mv1">
+							<div class="mw6">
+								<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" class="ba graph" viewBox="0 0 500 500" id="match_graph">
+									<g class="graph-header">
+										<text x="10" dy="30" y="0" class="graph-header orange-graph" text-anchor="left">Match</text>
+									</g>
+									<g class="graph-grid-x">
+										<line x1="50" y1="450" x2="400" y2="450" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
+									</g>
+									<g class="graph-grid-y">
+										<line x1="51" y1="61" x2="51" y2="451" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
+									</g>
+
+									<g class="graph-axis-x">
+										<line x1="100" y1="460" x2="100" y2="450" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
+										<!-- stroke-dasharray="10" -->
+									</g>
+									<g class="graph-axis-y">
+										<line x1="50" y1="350" x2="40" y2="350" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
+									</g>
+
+									<g class="graph-labels-x">
+										<text x="100" dy="475" y="0" class="graph-text orange-graph" text-anchor="middle">apples</text>
+									</g>
+									<g class="graph-labels-y">
+										<text x="30" dy="355" y="0" class="graph-text orange-graph" text-anchor="middle">3</text>
+									</g>
+
+									<g class="graph-bars">
+										<rect x="80" y="350" width="40" height="100" shape-rendering="auto" class="orange-graph"></rect>
+									</g>
+								</svg>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 
