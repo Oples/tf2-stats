@@ -1,3 +1,4 @@
+
 // Buttons "enumerator"
 const boxType = {
   KILL: "kill",
@@ -32,17 +33,17 @@ function toggleShowBox(elemId, button_type) {
       break;
   }
 
-  if(!list1Elem.classList.contains("h0")) {
+  if(!list1Elem.classList.contains("maxh0")) {
     // if is already shown
     // Hide all
-    list1Elem.classList.add('h0');
-    list2Elem.classList.add('h0');
+    list1Elem.classList.add('maxh0');
+    list2Elem.classList.add('maxh0');
   } else {
     // Show selected
     list2Elem.classList.add('dn');
-    list1Elem.classList.remove('h0', 'dn');
-    list1Elem.classList.add('transition-h4');
-    list2Elem.classList.add('h0');
+    list1Elem.classList.remove('maxh0', 'dn');
+    list1Elem.classList.add('transition-maxh4');
+    list2Elem.classList.add('maxh0');
   }
 }
 
