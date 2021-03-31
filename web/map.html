@@ -16,6 +16,7 @@
 		<title>TF2 Stats</title>
 		<link rel="stylesheet" href="tachyons.min.css">
 		<link rel="stylesheet" href="master.css">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw==" crossorigin="anonymous"></script>
 	</head>
 
 	<body class="sans-serif near-white cover h-100">
@@ -241,41 +242,11 @@
 				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
 					<div class="bg-mid-gray pa2">
 						<div class="mv1">
-							<h2 class="f3 fw1 mv1 truncate">Current match graphs:</h2>
+							<h2 class="f3 fw1 mv1">Current match graph:</h2>
 						</div>
-						<div class="mv1">
-							<div class="mw6">
-								<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="100%" height="100%" class="ba graph" viewBox="0 0 500 500" id="match_graph">
-									<g class="graph-header">
-										<text x="10" dy="30" y="0" class="graph-header orange-graph" text-anchor="left">Match</text>
-									</g>
-									<g class="graph-grid-x">
-										<line x1="50" y1="450" x2="400" y2="450" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
-									</g>
-									<g class="graph-grid-y">
-										<line x1="51" y1="61" x2="51" y2="451" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
-									</g>
-
-									<g class="graph-axis-x">
-										<line x1="100" y1="460" x2="100" y2="450" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
-										<!-- stroke-dasharray="10" -->
-									</g>
-									<g class="graph-axis-y">
-										<line x1="50" y1="350" x2="40" y2="350" fill="none" shape-rendering="crispEdges" stroke-width="2" class="near-white-graph"></line>
-									</g>
-
-									<g class="graph-labels-x">
-										<text x="100" dy="475" y="0" class="graph-text orange-graph" text-anchor="middle">apples</text>
-									</g>
-									<g class="graph-labels-y">
-										<text x="30" dy="355" y="0" class="graph-text orange-graph" text-anchor="middle">3</text>
-									</g>
-
-									<g class="graph-bars">
-										<rect x="80" y="350" width="40" height="100" shape-rendering="auto" class="orange-graph"></rect>
-									</g>
-								</svg>
-							</div>
+						<div class="mv2 mv4-ns mw6 center">
+							<canvas id="kill_chart" width="100%" height="100%">
+							</canvas>
 						</div>
 					</div>
 				</div>
@@ -296,5 +267,6 @@
 			</footer>
 		</div>
   	<script src="fun.js" charset="utf-8"></script>
+	<script src="charts.js" charset="utf-8"></script>
 	</body>
 </html>
