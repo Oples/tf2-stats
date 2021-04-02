@@ -11,7 +11,7 @@
 		<!-- Add to homescreen -->
 		<meta name="mobile-web-app-capable" content="yes">
 		<meta name="description" content="tf2 hats gen">
-		<meta name="author" content="Oples">
+		<meta name="author" content="Oples, Laykeen">
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Stats</title>
 		<link rel="stylesheet" href="tachyons.min.css">
@@ -19,16 +19,47 @@
 		<link rel="stylesheet" href="master.css">
 	</head>
 
-	<body class="sans-serif near-white cover h-100">
-		<div class="flex bg-img flex-column min-h-100">
-			<div class="mw-90 mw8-l center pv3 fg1" role="main">
-				<div class="bg-dark-gray pa3 pa4-l center br1">
-					<div class="w-100">
-						Hello
+		<body class="sans-serif near-white cover h-100">
+			<div class="flex bg-img flex-column min-h-100">
+				<div class="mw-90 mw7 center pv3 fg1" role="main">
+					<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+						<div id="title-header" class="dt-ns dt--fixed w-100">
+							<div class="dtc-l">
+								<h1 class="fw10 f2 truncate orange mv1">History</h1>
+							</div>
+							<div class="dtc-l">
+								<h2 class="f3 fw1 tr-l mv1 truncate">Owner</h2>
+							</div>
+						</div>
+
+						<div class="bg-white mv2" style="height:2px"></div>
+
+						<div class="bg-mid-gray pa3 br2 mt3">
+							<div class="dt w-100 dt--fixed">
+								<div class="dt-row">
+									<dl class="lh-title mv2">
+								    <dt class="dib light-gray b">Map:</dt>
+								    <dd class="dib ml0 white-70">Dustbowl</dd>
+								  </dl>
+									<dl class="lh-title mv2">
+								    <dt class="dib light-gray b">Date/Time:</dt>
+								    <dd class="dib ml0 white-70">2021-03-29 18:26:00 GMT</dd><!--ISO 8601 + locale system time-->
+								  </dl>
+									<dl class="lh-title mv2">
+								    <dt class="dib light-gray b">N&deg; Players:</dt>
+								    <dd class="dib ml0 white-70">32 / 32</dd>
+								  </dl>
+
+									<a class="bn link f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" href="map.html">Match info</a>
+
+								</div>
+							</div>
+						</div>
+
 					</div>
 				</div>
 			</div>
-		</div>
+
 
   		<footer class="bg-dark-gray white-80 pv4 ph5">
   			<div class="f5">
@@ -43,7 +74,6 @@
   				</div>
   			</div>
   		</footer>
-  	</div>
   	<script src="fun.js" charset="utf-8"></script>
   </body>
 </html>
