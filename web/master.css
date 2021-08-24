@@ -1,3 +1,4 @@
+/* backgrounds & colors */
 .bg-img {
   /*background-image: url(https://cdn.pixabay.com/photo/2013/07/21/13/00/rose-165819_960_720.jpg);*/
   background: rgb(143,33,36);
@@ -7,38 +8,43 @@
   background: linear-gradient(0deg, rgb(143,33,36) 0%, rgb(41,52,70) 90%);
 }
 .near-white {color: #CACACA;}
+.near-white-graph {stroke: #CACACA;}
 .near-near-white {color: #DEDEDE;}
 
 .bg-dark-gray {background-color: #272425;}
 .bg-mid-gray {background-color: #333333;}
 
 .orange {color: #eba73e;}
+.orange-graph {fill: #eba73e;}
 .bg-orange {background-color: #eba73e;}
 
-.dark-orange {color: #9d5422;}
+.dark-orange {color: #9e4e18;}
 .bg-dark-orange {background-color: #9d5422;}
 
+.bg-dark-red {background-color: #A40909;}
+
+/* misc css */
 @media screen and (max-width: 60em) {
   .mw-90 {max-width: 90%;}
 }
 .list-mv1 > li {
   margin: 0.4em;
 }
-.bg-dark-red {
-  background-color: #A40909;
-}
 .link {
   transition: unset !important;
 }
+
 * {
   scrollbar-color: #42474a #1b1e1f;
 }
+
 .fg1 {
   flex-grow: 1;
 }
 .overflow-break-word {
   overflow-wrap: break-word;
 }
+
 .wrapword {
   white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
   white-space: -pre-wrap; /* Opera  4-6 */
@@ -48,11 +54,6 @@
   white-space: -webkit-pre-wrap; /* Newer versions of Chrome/Safari*/
   word-break: break-all;
   white-space: normal;
-}
-
-.transition-h4 {
-  max-height: 18rem;
-  transition: max-height 0.7s;
 }
 
 .stripe-dark-list > *:nth-child(odd) {
@@ -67,7 +68,12 @@
   }
 }
 
-.h0 {
+.transition-maxh4 {
+  max-height: 18rem;
+  transition: max-height 0.7s;
+}
+
+.maxh0 {
   max-height: 0;
   /*display: none;*/
 }
