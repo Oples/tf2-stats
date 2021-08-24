@@ -18,7 +18,8 @@ var logger = newConsoleLogger(levelThreshold=lvlAll, fmtStr="[$time] - $levelnam
 proc getCustomConsoleLogPath*(): string =
     if(appType == "console"):
         while(result == "" or not fileExists(result)):
-            result = readLineFromStdin("Custom location (console.log)\r\n$ ")
+            echo "Custom location (console.log)"
+            result = readLineFromStdin("$ ")
 
         echo "You confirm this directory?"
         stdout.write result & " [Y/n] "
@@ -26,7 +27,7 @@ proc getCustomConsoleLogPath*(): string =
         let answer = getch()
         echo answer
 
-        if(answer != 'y'):
+        if(answer != 'y' and answer != 'Y' and answer != '\n'):
             return ""
 
 

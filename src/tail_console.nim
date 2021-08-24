@@ -733,8 +733,6 @@ proc update_info(line: string, print: bool) =
     else:
         return
 
-    #echo ""
-
 
 proc main() =
     var TF2LogFilename = "console.log"
@@ -742,8 +740,13 @@ proc main() =
     var file_path = get_tf2_path()  / TF2LogFilename
     var file_size = 0'i64
 
+    when declared(commandLineParams):
+        echo commandLineParams()
+        file_path = commandLineParams()[0]
+
     if file_path == "":
-        echo "error"
+        echo "error file path is empty!"
+        quit(1)
 
     var f : File
 
