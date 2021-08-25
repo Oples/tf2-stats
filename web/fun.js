@@ -84,13 +84,13 @@ function filterPlayersList(input, filterType) {
             // show names if filter matches or there is no filter
             if(dataUp.indexOf(inputUp) !== -1 || inputUp.length <= 0) {
                 allPlayersData[i].container.classList.remove(
-                    'h0', 'dn'
+                    'maxh0', 'dn'
                 );
             }
             // else hide this player's container
             else {
                 allPlayersData[i].container.classList.add(
-                    'h0', 'dn'
+                    'maxh0', 'dn'
                 );
             }
         }
