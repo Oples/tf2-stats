@@ -326,6 +326,9 @@ type
         kills: seq[Kill]
 
 
+proc newMatch(): Match =
+    new(result)
+
 method toJson(self: Match): JsonNode {.base.} =
     var json_node = newJObject()
     json_node.add("ip", newJString(self.ip))
@@ -468,8 +471,8 @@ var server_ip = ""
 var mm_id = ""
 var n_friends = 0
 var tf2 = newGame()
-var match = cast[Match](nil)
-
+var match = newMatch()
+var matchStart = false
 
 proc update_info(line: string, print: bool) =
     var m: RegexMatch
@@ -501,8 +504,9 @@ proc update_info(line: string, print: bool) =
         if match != cast[Match](nil):
             saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
         match = tf2.newMatch(server_ip, map)
+        matchStart = true
 
-    elif match == cast[Match](nil):
+    elif not matchStart:
         return
 
     elif line.match(re"^(.*) connected$", m):
@@ -532,25 +536,20 @@ proc update_info(line: string, print: bool) =
 
         if tName == OWNER:
             OWNER_deaths += 1
-            if print:
-                echo OWNER, " deaths total: ", OWNER_deaths
+            logger.log(lvlDebug, OWNER, " deaths total: ", OWNER_deaths)
 
+    elif line == "":
+        discard
 
     elif line.match(re"^(.*) suicided.$", m) or line.match(re"^(.*) died.$", m):
         let sName = m.groupFirstCapture(0, line)
-
-        if print:
-            echo sName, " needs ze healing."
-        if OWNER == sName:
-            OWNER_deaths += 1
+        logger.log(lvlDebug, sName, " suicided.")
 
     elif line.match(re"(.*) selected", m):
         let class = m.groupFirstCapture(0, line)
         # to do implement class statistics
-        if print: echo("CLASS: ", class)
+        logger.log(lvlDebug, "CLASS: ", class)
 
-    elif line == "":
-        discard
 
     elif line == "Client reached server_spawn." and connecting == 5:
         connecting += 1
@@ -604,10 +603,9 @@ proc update_info(line: string, print: bool) =
         var say_player: Player = match.addPlayer(pName)
         var msg : Chat = newMsg( false, true, true, message, say_player)
         match.addMsg(msg)
-        if print:
-            echo "r.i.p. teamate message"
-            echo("Player: ", pName)
-            echo("Text: ", message)
+        logger.log(lvlDebug, "r.i.p. teamate message")
+        logger.log(lvlDebug, "Player: ", pName)
+        logger.log(lvlDebug, "Text: ", message)
         #[let p_say = newJObject()
         p_say.add( matches[0], newJString(matches[1]))
         chat["chat"].add(p_say)
@@ -619,10 +617,9 @@ proc update_info(line: string, print: bool) =
         var say_player: Player = match.addPlayer(pName)
         var msg : Chat = newMsg( false, true, false, message, say_player)
         match.addMsg(msg)
-        if print:
-            echo("r.i.p. message")
-            echo("Player: ", pName)
-            echo("Text: ", message)
+        logger.log(lvlDebug, "r.i.p. message")
+        logger.log(lvlDebug, "Player: ", pName)
+        logger.log(lvlDebug, "Text: ", message)
 
     elif line.match(re"^\(TEAM\) (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -630,10 +627,9 @@ proc update_info(line: string, print: bool) =
         var say_player: Player = match.addPlayer(pName)
         var msg : Chat = newMsg( false, true, false, message, say_player)
         match.addMsg(msg)
-        if print:
-            echo("team message")
-            echo("Player: ", pName)
-            echo("Text: ", message)
+        logger.log(lvlDebug,"team message")
+        logger.log(lvlDebug,"Player: ", pName)
+        logger.log(lvlDebug,"Text: ", message)
 
     elif line.match(re"^\*SPEC\* (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -660,21 +656,17 @@ proc update_info(line: string, print: bool) =
 
     elif line.match(re"\[PartyClient\] Joining party [0-9]+", m):
         n_friends += 1
-        if print:
-            echo "FRIENDS?????? ", n_friends
+        logger.log(lvlDebug, "FRIENDS?????? ", n_friends)
 
     elif line == "Sending request to abandon current match":
-        if print:
-            echo "MATCH END #1"
+        logger.log(lvlDebug, "MATCH END #1")
 
     elif line == "Disconnecting from abandoned match server":
-        if print:
-            echo "MATCH END #2"
+        logger.log(lvlDebug, "MATCH END #2")
 
     elif line == "Sending request to exit matchmaking, marking assigned match as ended":
         saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
-        if print:
-            echo "MATCH END #3"
+        logger.log(lvlDebug, "MATCH END #3")
 
 
     elif line.match(re"^(.*) defended (.*) for team #([0-9]+){1}$", m) or
@@ -737,12 +729,13 @@ proc update_info(line: string, print: bool) =
 proc main() =
     var TF2LogFilename = "console.log"
 
-    var file_path = get_tf2_path()  / TF2LogFilename
+    var file_path = get_tf2_path() #  / TF2LogFilename
     var file_size = 0'i64
 
     when declared(commandLineParams):
-        echo commandLineParams()
-        file_path = commandLineParams()[0]
+        if commandLineParams().len > 0:
+            echo commandLineParams()
+            file_path = commandLineParams()[0]
 
     if file_path == "":
         echo "error file path is empty!"
