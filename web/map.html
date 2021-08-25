@@ -15,8 +15,8 @@
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Stats</title>
 		<link rel="stylesheet" href="tachyons.min.css">
-		<link rel="stylesheet" href="animate.min.css">
 		<link rel="stylesheet" href="master.css">
+		<script src="Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
 	</head>
 
 	<body class="sans-serif near-white cover h-100">
@@ -24,223 +24,231 @@
 			<div class="mw-90 mw8-l center pv3 fg1" role="main">
 				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
 					<div id="title-header" class="dt-ns dt--fixed w-100">
-						<div class="dtc-l">
+						<div class="dtc-l w-75-l">
 							<h1 class="fw10 f2 truncate orange mv1">mvm_2fort_nasuds_Sdubdc_trainsawtrainmeelhighertower</h1>
 						</div>
 						<div class="dtc-l">
-							<h2 class="f3 fw1 tr-l mv1 truncate">battle history LAYKEEN WAZ HERE</h2>
+							<h2 class="f3 fw1 tr-l mv1 truncate">battle history</h2>
 						</div>
 					</div>
 
 					<div class="bg-white mv2" style="height:2px"></div>
 
-					<div class="center">
-						<label for="filter">Filter:</label>
-						<input class="input-reset ba b--black-20 pa2 db w-100 bg-mid-gray near-white" type="text" name="filter">
+					<div class="center mt3">
+						<label class="clip" for="filter">Filter:</label>
+						<input class="input-reset ba b--black-20 pa2 db w-100 bg-mid-gray near-white" type="text" name="filter" placeholder="Filter by players' name..." onkeyup="filterPlayersList(this.value, filterType.NAME)">
 					</div>
 
-					<div class="dt dt--fixed">
-						<div class="dt-row">
-							<div class="dtc-l">
-								<div class="ma1-l">
-									<div class="bg-mid-gray pa3 br2 mt3">
-										<div class="dt w-100 dt--fixed mb3">
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Name
-												</div>
-												<div class="dtc truncate">
-													: <label class="white">Oples</label>
-												</div>
+					<ul class="ma0 pa0 list db flex-l" id="players_list">
+						<li class="w-100 w-50-l">
+							<div class="ma2">
+								<div class="bg-mid-gray pa3 br2">
+									<div class="dt w-100 dt--fixed mb3">
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Name
 											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Team
-												</div>
-												<div class="dtc">
-													: <label class="red b">RED</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													K/D Ratio
-												</div>
-												<div class="dtc">
-													: <label>-1 sadge</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Crit%
-												</div>
-												<div class="dtc">
-													: <label>1%</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Weapon&#9733;
-												</div>
-												<div class="dtc">
-													: <label>Sentry</label>
-												</div>
+											<div class="dtc truncate">
+												: <label class="white">Oples</label>
 											</div>
 										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Team
+											</div>
+											<div class="dtc">
+												: <label class="red b">RED</label>
+											</div>
+										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												K/D Ratio
+											</div>
+											<div class="dtc">
+												: <label>-1 sadge</label>
+											</div>
+										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Crit%
+											</div>
+											<div class="dtc">
+												: <label>1%</label>
+											</div>
+										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Weapon&#9733;
+											</div>
+											<div class="dtc">
+												: <label>Sentry</label>
+											</div>
+										</div>
+									</div>
 
-										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(1, boxType.CHAT);">Chat</button>
-										<div class="fr">
-											<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(1, boxType.KILL);">Kills</button>
-										</div>
+									<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(1, boxType.CHAT);">Chat</button>
+									<div class="fr">
+										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(1, boxType.KILL);">Kills</button>
 									</div>
-									<div id="chatHistory_1" class="overflow-hidden maxh0">
-										<div class="child-bg-art pt2 ml1-l pl2-l">
-											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
-												<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
-													<div class="pa0 ma0 stripe-dark-list">
-														<!-- Remember to rstrip -->
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
-														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
-														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-									<div id="killHistory_1" class="overflow-hidden maxh0">
-										<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
-											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+								</div>
+								<div id="chatHistory_1" class="overflow-hidden maxh0">
+									<div class="child-bg-art pt2 ml1-l pl2-l">
+										<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
 											<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
 												<div class="pa0 ma0 stripe-dark-list">
 													<!-- Remember to rstrip -->
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
+													<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
+													<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
 												</div>
 											</div>
-										</div>
 										</div>
 									</div>
 								</div>
+								<div id="killHistory_1" class="overflow-hidden maxh0">
+									<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
+										<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+										<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+											<div class="pa0 ma0 stripe-dark-list">
+												<!-- Remember to rstrip -->
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+											</div>
+										</div>
+									</div>
+									</div>
+								</div>
 							</div>
-
-							<div class="dtc-l">
-								<div class="ma1-l">
-									<div class="bg-mid-gray pa3 br2 mt3">
-										<div class="dt w-100 dt--fixed mb3">
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Name
-												</div>
-												<div class="dtc truncate">
-													: <label class="white">Oples</label>
-												</div>
+						</li>
+						<li class="w-100 w-50-l">
+							<div class="ma2">
+								<div class="bg-mid-gray pa3 br2">
+									<div class="dt w-100 dt--fixed mb3">
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Name
 											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Team
-												</div>
-												<div class="dtc">
-													: <label class="red b">RED</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													K/D Ratio
-												</div>
-												<div class="dtc">
-													: <label>-1 sadge</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Crit%
-												</div>
-												<div class="dtc">
-													: <label>1%</label>
-												</div>
-											</div>
-											<div class="dt-row">
-												<div class="dtc b pt1">
-													Weapon&#9733;
-												</div>
-												<div class="dtc">
-													: <label>Sentry</label>
-												</div>
+											<div class="dtc truncate">
+												: <label class="white">Moon_Blood-driller</label>
 											</div>
 										</div>
-
-										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(2, boxType.CHAT);">Chat</button>
-										<div class="fr">
-											<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(2, boxType.KILL);">Kills</button>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Team
+											</div>
+											<div class="dtc">
+												: <label class="blue b">BLUE</label>
+											</div>
 										</div>
-									</div>
-									<div id="chatHistory_2" class="overflow-hidden maxh0">
-										<div class="child-bg-art pt2 ml1-l pl2-l">
-											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
-												<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
-													<div class="pa0 ma0 stripe-dark-list">
-														<!-- Remember to rstrip -->
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
-														<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
-														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
-														<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
-														<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
-													</div>
-												</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												K/D Ratio
+											</div>
+											<div class="dtc">
+												: <label>9000 sadge</label>
+											</div>
+										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Crit%
+											</div>
+											<div class="dtc">
+												: <label>99%</label>
+											</div>
+										</div>
+										<div class="dt-row player_field">
+											<div class="dtc b pt1">
+												Weapon&#9733;
+											</div>
+											<div class="dtc">
+												: <label>Hands</label>
 											</div>
 										</div>
 									</div>
-									<div id="killHistory_2" class="overflow-hidden maxh0">
-										<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
-											<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+
+									<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-blue" onmousedown="toggleShowBox(2, boxType.CHAT);">Chat</button>
+									<div class="fr">
+										<button class="bn pointer f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" onmousedown="toggleShowBox(2, boxType.KILL);">Kills</button>
+									</div>
+								</div>
+								<div id="chatHistory_2" class="overflow-hidden maxh0">
+									<div class="child-bg-art pt2 ml1-l pl2-l">
+										<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
 											<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
 												<div class="pa0 ma0 stripe-dark-list">
 													<!-- Remember to rstrip -->
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
-													<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
-													<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>wdym I'm dead?</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Oh</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>Welp guess I'm dead now</div>
+													<div class="pa1"><label class="mr1 b">*dead* <label class="blue">Oples</label>:</label>fair enough</div>
+													<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>psss hey, hey</div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>PUUUUSH</div>
+													<div class="pa1"><label class="mr1 b">(team) <label class="blue">Oples</label>:</label>&lt;&lt;UBER READY&gt;&gt;</div>
+													<div class="pa1"><label class="mr1 b"><label class="blue">Oples</label>:</label>REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</div>
 												</div>
 											</div>
 										</div>
+									</div>
+								</div>
+								<div id="killHistory_2" class="overflow-hidden maxh0">
+									<div class="child-bg-art pt2 ml1-l pl2-l overflow-hidden">
+										<div class="bg-mid-gray ml2-ns ml3-l pa2 br2 mt1">
+										<div class="overflow-scroll overflow-x-hidden overflow-break-word h5-l h4">
+											<div class="pa0 ma0 stripe-dark-list">
+												<!-- Remember to rstrip -->
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+												<div class="pa1 b"><label class="blue">Oples</label> killed <label class="red">Moon_Blood</label></div>
+												<div class="pa1 b"><label class="red">Moon_Blood</label> killed <label class="blue">Oples</label></div>
+											</div>
 										</div>
+									</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-
+						</li>
+					</ul>
 
 					<div class="bg-mid-gray mt3 mb2" style="height:2px"></div>
+				</div>
+
+				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+					<div class="bg-mid-gray pa2">
+						<div class="mv1">
+							<h2 class="f3 fw1 mv1">Current match graph:</h2>
+						</div>
+						<div class="mv2 mv4-ns mw6 center">
+							<canvas id="kill_chart" width="100%" height="100%">
+							</canvas>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -259,5 +267,6 @@
 			</footer>
 		</div>
   	<script src="fun.js" charset="utf-8"></script>
+	<script src="charts.js" charset="utf-8"></script>
 	</body>
 </html>
