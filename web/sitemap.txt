@@ -3,7 +3,7 @@ Index.html / History
    |
    - Real Time
    |
-   - map#ID.html / Map history list
+   - map/ID / Map history list
       |
       - Map info
       |

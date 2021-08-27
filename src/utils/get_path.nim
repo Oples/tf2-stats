@@ -101,15 +101,18 @@ proc getFileWindow(): string =
 
     result = logPath
 
+
 proc getCustomConsoleLogPath*(): string =
     when(appType == "console"):
         while(result == ""):
             while(result == "" or not fileExists(result)):
                 echo "Custom location (console.log)"
                 result = readLineFromStdin("$ ")
+                if not fileExists(result):
+                    echo "ERROR: File not found ", result
 
-            echo "You confirm this directory?"
-            stdout.write result & " [Y/n] "
+            echo "Do you confirm this directory?"
+            stdout.write "\"" & result & "\" [Y/n] "
 
             let answer = getch()
             echo answer
@@ -148,7 +151,7 @@ proc getTF2Path*(): string =
                 )
             )
         except OSError:
-            logger.log(lvlError, "Got beaned trying to get a reg val:")
+            logger.log(lvlError, "Got blocked or resource not found while reading a registry value:")
             echo getCurrentExceptionMsg()
 
         steamLauncherInstallPath = steamInstallDir / SteapApps
@@ -160,7 +163,7 @@ proc getTF2Path*(): string =
 
     if(dirExists(steamLauncherInstallPath)):
         # in the steam launcher get the library location file
-        logger.log(lvlDebug, "Auto found the Steam Launcher location\n")
+        logger.log(lvlInfo, "Auto [success!]: found the Steam Launcher location\n")
         logger.log(lvlDebug, steamLauncherInstallPath,"\n")
 
         steamPossibleLibraries.add(steamLauncherInstallPath)
@@ -201,13 +204,22 @@ proc getTF2Path*(): string =
         for sLib in TF2InstallPath:
             logger.log(lvlDebug, sLib)
 
-        if TF2InstallPath.len() == 1:
+        if TF2InstallPath.len == 1:
             result = TF2InstallPath[0]
         else:
-            # ambiguity multiple installs or none?
+            if TF2InstallPath.len > 1:
+                # ambiguity multiple installs or none?
+                logger.log(lvlWarn, "Auto fetch found Steam and Multiple TF2 folders")
+                #raise newException(RangeDefect , "Ambiguity error: Multiple installs detected!")
+            else:
+                logger.log(lvlError, "Auto fetch found Steam but not the game")
+                logger.log(lvlError, "Is the game even installed?")
+                #raise newException(RangeDefect , "The Team Fortress 2 folder was not found!")
+
             result = getCustomConsoleLogPath()
+
     else:
-        logger.log(lvlWarn, "No Steam Launcher install path found")
+        logger.log(lvlWarn, "No Steam Launcher path found")
         result = getCustomConsoleLogPath()
 
 
