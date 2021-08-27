@@ -1,3 +1,9 @@
+#                                                  #
+# Under MIT License                                #
+# Author: (c) 2021 Oples                           #
+# Original repo can be found at:                   #
+#      https://github.com/Oples/tf2-stats          #
+#                                                  #
 import std/[asynchttpserver, asyncdispatch, strutils]
 import std/[os, htmlgen, json, logging]
 import ws
@@ -38,6 +44,7 @@ const doc = """<html>
 
 #waitFor(sleepAsync(2 * 1000)) # 10s
 #let packet = await ws.receiveStrPacket()
+
 
 proc tf2logger() {.thread.} =
     logger = newConsoleLogger(levelThreshold=lvlDebug, fmtStr="[$time] - $levelname: ")
@@ -136,6 +143,7 @@ proc startTF2Logger*() =
 
     joinThreads thr
     chan.close()
+
 
 when isMainModule:
     startTF2Logger()

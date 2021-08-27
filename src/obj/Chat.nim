@@ -1,6 +1,14 @@
+#                                                  #
+# Under MIT License                                #
+# Author: (c) 2021 Oples                           #
+# Original repo can be found at:                   #
+#      https://github.com/Oples/tf2-stats          #
+#                                                  #
 import times
 import json
 import Player
+
+
 ##
 ##   chat class
 ##
@@ -13,6 +21,7 @@ type
         text: string # The message itself
         player: Player # The player who sent it
 
+
 proc newMsg*(spectator: bool, dead: bool, team: bool, text: string, player: Player): Chat =
     new(result)
     result.time = getTime()
@@ -24,6 +33,17 @@ proc newMsg*(spectator: bool, dead: bool, team: bool, text: string, player: Play
 
 
 method toJson*(self: Chat): JsonNode {.base.} =
+    ##[
+        ```json
+        {
+            "spectator" : false,
+            "dead" : true,
+            "team" : true,
+            "player" : "Oples"
+            "text" : "gg"
+        }
+        ```
+    ]##
     var json_node = newJObject()
     #json_node.add("time", newJString($self.time.utc))
     json_node.add("spectator", newJBool(self.spectator))

@@ -1,6 +1,6 @@
 #                                                  #
 # Under MIT License                                #
-# Author: (c) 2020 Oples                           #
+# Author: (c) 2021 Oples                           #
 # Original repo can be found at:                   #
 #      https://github.com/Oples/tf2-stats          #
 #                                                  #
@@ -19,22 +19,22 @@ when(appType == "gui"):
 var logger = newConsoleLogger(levelThreshold=lvlAll, fmtStr="[$time] - $levelname: ")
 
 
-proc getFileWindow(): string =
-    var logPath {.threadvar.} : string
-    logPath = ""
+when(appType == "gui"):
+    proc getFileWindow(): string =
+        var logPath {.threadvar.} : string
+        logPath = ""
 
-    when(appType == "gui"):
         app.init()
 
         var window = newWindow("TF2 Logger")
 
         proc quitMsgProc() =
-           case window.msgBox("Do you want to quit?", "Quit", "Quit", "Cancel")
-           of 1:
-               window.dispose()
-               app.quit()
-               quit(0)
-           else: discard
+            case window.msgBox("Do you want to quit?", "Quit", "Quit", "Cancel")
+            of 1:
+                window.dispose()
+                app.quit()
+                quit(0)
+            else: discard
 
         window.onCloseClick = proc(event: CloseClickEvent) =
             quitMsgProc()
@@ -99,7 +99,7 @@ proc getFileWindow(): string =
         window.show()
         app.run()
 
-    result = logPath
+        result = logPath
 
 
 proc getCustomConsoleLogPath*(): string =

@@ -1,26 +1,12 @@
+#                                                  #
+# Under MIT License                                #
+# Author: (c) 2021 Oples                           #
+# Original repo can be found at:                   #
+#      https://github.com/Oples/tf2-stats          #
+#                                                  #
 import Player
-import json
-import times
-
-
-##
-##  Weapon class
-##
-type
-    Weapon* = ref object
-        obj_str*: string
-        name*: string
-
-method toJson*(self: Weapon): JsonNode {.base.} =
-    var json_node = newJObject()
-    json_node.add("console_name", newJString(self.obj_str))
-    return json_node
-
-proc newWeapon*(obj_str: string): Weapon =
-    new(result)
-    result.obj_str = obj_str
-    result.name = obj_str
-
+import Weapon
+import std/[json, times]
 
 ##
 ##   Kill class
@@ -53,24 +39,23 @@ proc newKill*(
     result.weapon = newWeapon(weapon)
     result.crit = crit
 
-##
-##{
-##  "kill": {
-##    "time": "",
-##    "actor": {
-##      "name" : "Op",
-##      "altSide" : false,
-##      "weapon" : "boom",
-##      "crit" : true
-##    },
-##    "target": {
-##      "name" : "Op",
-##      "altSide" : true
-##    }
-##  }
-##}
-##
+
 method toJson*(self: Kill): JsonNode {.base.} =
+    ##```json
+    ##{
+    ##  "time": "",
+    ##  "actor": {
+    ##    "name" : "Op",
+    ##    "altSide" : false,
+    ##    "weapon" : "boom",
+    ##    "crit" : true
+    ##  },
+    ##  "target": {
+    ##    "name" : "Op",
+    ##    "altSide" : true
+    ##  }
+    ##}
+    ##```
     var json_node = newJObject()
     #json_node.add("time", newJString($self.time.utc))
 

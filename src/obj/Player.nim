@@ -1,7 +1,10 @@
-import json
-import times
-import deques
-
+#                                                  #
+# Under MIT License                                #
+# Author: (c) 2021 Oples                           #
+# Original repo can be found at:                   #
+#      https://github.com/Oples/tf2-stats          #
+#                                                  #
+import std/[json, times, deques]
 
 
 proc oscillate*(num: int):int =
@@ -9,6 +12,7 @@ proc oscillate*(num: int):int =
         return num - 1 # team A
     else:
         return num + 1 # team B
+
 
 ##
 ## Team Balance
@@ -36,16 +40,19 @@ type
     Player* = ref object
         name*: string
         team*: int
-            #[
+        #[
             0: Unknown
             1: A # Unknown A
             2: B # Unknown B
-            ]#
-        teamSwitch*: seq[TeamBalance]
+            else: Unknown
+        ]#
+        teamBalance*: seq[TeamBalance]
+        teamSwitch*: seq[TeamSwitch]
         kills*: seq[Player]
         team_kills*: seq[Player]
         killed*: seq[Player]
         team_killed*: seq[Player]
+
 
 method toJson*(self: Player): JsonNode {.base.} =
     var json_node = newJObject()
@@ -53,9 +60,9 @@ method toJson*(self: Player): JsonNode {.base.} =
     json_node.add("team", newJInt(self.team))
 
     var arr = newJArray()
-    for team_balance in self.team_switch:
-        arr.add(newJString($(team_balance.time.utc)))
-    json_node.add("team_switch", arr)
+    for teamBalance in self.teamBalance:
+        arr.add(newJString($(teamBalance.time.utc)))
+    json_node.add("teamBalance", arr)
     #[arr = newJArray()
     for p in self.kills:
         arr.add(newJString(p.name))
@@ -80,13 +87,15 @@ proc newPlayer*(name: string): Player =
     new(result)
     result.name = name
     result.team = 0
+    result.teamBalance = @[]
     result.teamSwitch = @[]
     result.kills = @[]
     result.team_kills = @[]
     result.team_killed = @[]
 
+
 method newDeath*(self: var Player, player: var Player) {.base.} =
-    if (len(self.team_switch) mod 2) == (len(player.team_switch) mod 2):
+    if (len(self.teamBalance) mod 2) == (len(player.teamBalance) mod 2):
         if not self.killed.contains(player):
             self.killed.add(player)
     else:
@@ -94,10 +103,11 @@ method newDeath*(self: var Player, player: var Player) {.base.} =
         if not self.team_killed.contains(player):
             self.team_killed.add(player)
 
+
 method newKill*(self: var Player, player: var Player) {.base.} =
     player.newDeath(self)
 
-    if (len(self.team_switch) mod 2) == (len(player.team_switch) mod 2):
+    if (len(self.teamBalance) mod 2) == (len(player.teamBalance) mod 2):
         if not self.kills.contains(player):
             self.kills.add(player)
     else:
@@ -105,10 +115,12 @@ method newKill*(self: var Player, player: var Player) {.base.} =
         if not self.team_kills.contains(player):
             self.team_kills.add(player)
 
+
 # Team Balance
 method switchSide*(self: var Player) {.base.} =
     var team_balance: TeamBalance = TeamBalance(time: getTime())
-    self.team_switch.add(team_balance)
+    self.teamBalance.add(team_balance)
+
 
 method setKillsTeam*(self: var Player, team: int) {.base.} =
     for p in self.kills:
@@ -117,6 +129,7 @@ method setKillsTeam*(self: var Player, team: int) {.base.} =
     for p in self.killed:
         if p.team == 0 or team < p.team:
             p.team = team
+
 
 method setTeamKillsTeam(self: var Player, team: int) {.base.} =
     for p in self.team_kills:
@@ -200,7 +213,6 @@ method updatePropagate*(self: var Player):bool {.base.} =
                 visited.add(p)
                 queue.addFirst(p)
 
-
     var min_t = self.team
     var min_p = self
 
@@ -212,10 +224,4 @@ method updatePropagate*(self: var Player):bool {.base.} =
                 min_t = p.team
                 min_p = p
 
-
     return min_p.propagateTeams()
-
-
-method teamSwitch*(self: Player) : seq[TeamBalance] {.base.} =
-    # TODO: change TeamBalance to team Switch
-    return self.teamSwitch

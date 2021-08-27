@@ -1,55 +1,15 @@
-import json
-import times
+#                                                  #
+# Under MIT License                                #
+# Author: (c) 2021 Oples                           #
+# Original repo can be found at:                   #
+#      https://github.com/Oples/tf2-stats          #
+#                                                  #
+import std/[json, times]
 import Player
 import Chat
 import Kill
-
-
-##
-## Generic data to log in chronological order
-##
-type
-    LogData* = ref object of RootObj
-        ldType : int       # 0 = ldChat, 1 = ldKill, etc... (enables the use of generic data loging)
-        ldPlayer : Player
-        ldChat : Chat
-        ldKill : Kill
-        #ldTeam : TeamBalance
-
-proc newLogData(data : Chat) : LogData =
-    new(result)
-    result.ldType = 0
-    result.ldChat = data
-
-proc newLogData(data : Kill) : LogData =
-    new(result)
-    result.ldType = 1
-    result.ldKill = data
-
-proc newLogData(data : Player) : LogData =
-    new(result)
-    result.ldType = 2
-    result.ldPlayer = data
-
-#[proc newLogData(data : TeamBalance) : LogData =
-    new(result)
-    result.ldType = 3
-    result.ldTeam = data]#
-
-method toJson*(self: LogData): JsonNode {.base.} =
-    case self.ldType:
-        of 0:
-            result = self.ldChat.toJson()
-        of 1:
-            result = self.ldKill.toJson()
-        of 2:
-            result = self.ldPlayer.toJson()
-        #of 3:
-        #    result = self.ldTeam.toJson()
-        else:
-            result = newJObject()
-            result.add("ERROR", newJString("Log obj not supported!"))
-            raise newException(OSError, "Log object not expected")
+import Weapon
+import LogData
 
 ##
 ##  Match class
@@ -68,6 +28,7 @@ type
         kills*: seq[Kill]
         log*: seq[LogData]
 
+
 proc newMatch*(ip = "",
                map = "",
                time = DateTime(),
@@ -85,25 +46,66 @@ proc newMatch*(ip = "",
     result.side = side
     result.sideId = sideId
 
-##[ Match
-default:
-    side: false
-        side A (odd numbers) = RED
-        side B (even numbers) = BLU
-    side: true
 
-    "match": {
-        "time": null,
+method toJson*(self: Match): JsonNode {.base.} =
+    ##[
+    Match
+    default:
+        side: false
+            side A (odd numbers) = RED
+            side B (even numbers) = BLU
+        side: true
+
+    ```json
+    {
+        "time": "",
         "ip" : "127.0.0.1",
         "map" : "ctf_hydro",
-        "maxPlayers" : 123,
+        "players" : 16,
+        "side" : false,
+        "chat" : [{
+                "spectator" : false,
+                "dead" : true,
+                "team" : true,
+                "player" : "Oples"
+                "text" : "gg"
+            }],
+        "kills" : [{
+            "time": "",
+            "actor": {
+                "name" : "OplesBot 2.0",
+                "altSide" : false,
+                "weapon" : "sniper_rifle",
+                "crit" : true
+            },
+            "target": {
+                "name" : "Oples",
+                "altSide" : false
+            }
+        }],
+        "log" : [{
+            "event" : "Kill",
+            "data" : {
+                "time": "",
+                "actor": {
+                    "name" : "OplesBot 2.0",
+                    "altSide" : false,
+                    "weapon" : "sniper_rifle",
+                    "crit" : true
+                },
+                "target": {
+                    "name" : "Oples",
+                    "altSide" : false
+                }
+            },
+        }]
     }
-]##
-method toJson*(self: Match): JsonNode {.base.} =
+    ```
+    ]##
     var json_node = newJObject()
+    json_node.add("time", newJString($self.time.utc))
     json_node.add("ip", newJString(self.ip))
     json_node.add("map", newJString(self.map))
-    json_node.add("time", newJString($self.time.utc))
     var obj = newJObject()
     for p in self.players:
         var team = newJInt(p.team)
@@ -182,14 +184,17 @@ method addKill*(self: var Match, subject: string, target: string, weapon: Weapon
         #echo "PLAYER: ", $subj_p.name, "   TEAM: ", $subj_p.team
         discard
 
+
 method addMsg*(self: var Match, msg: Chat) {.base.} =
     self.chat.add(msg)
     self.log.add(newLogData(msg))
+
 
 method switchSide*(self: var Match) {.base.} =
     for p in self.players:
         var player:Player = p
         player.switchSide()
+
 
 method printChat*(self: Match) {.base.} =
     for msg in self.chat:
