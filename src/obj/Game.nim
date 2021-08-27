@@ -16,7 +16,7 @@ logger = newConsoleLogger(levelThreshold=lvlDebug, fmtStr="[$time] - $levelname:
 ##   Game class
 ##
 type
-    Game* = ref object
+    Game* = ref object of RootObj
         match*: seq[Match]
 
 
@@ -46,6 +46,16 @@ method currentMatch*(self: var Game): Match {.base.} =
         return newMatch()
 
 
+method toJson*(self: Game): JsonNode {.base.} =
+    var json_node = newJObject()
+    var arr = newJArray()
+    for m in self.match:
+        arr.add(m.toJson)
+    json_node.add("matches", arr)
+
+    return json_node
+
+
 proc saveJSON*(json_par: JsonNode, filePath: string) =
     try:
         writeFile(filePath, pretty(json_par))
@@ -54,4 +64,3 @@ proc saveJSON*(json_par: JsonNode, filePath: string) =
             e = getCurrentException()
             msg = getCurrentExceptionMsg()
         logger.log(lvlError, "ERROR: ", repr(e), " with ", msg)
- 

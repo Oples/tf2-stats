@@ -31,7 +31,7 @@ type
 
 proc newMatch*(ip = "",
                map = "",
-               time = DateTime(),
+               time = now(),
                playersNum = 0,
                maxPlayers = 0,
                side = false,
@@ -119,9 +119,9 @@ method toJson*(self: Match): JsonNode {.base.} =
         arr.add(c.toJson())
     json_node.add("chat", arr)
     arr = newJArray()
-    for k in self.kills:
-        arr.add(k.toJson())
-    json_node.add("kills", arr)
+    #for k in self.kills:
+    #    arr.add(k.toJson())
+    #json_node.add("kills", arr)
     for l in self.log:
         arr.add(l.toJson())
     json_node.add("log", arr)

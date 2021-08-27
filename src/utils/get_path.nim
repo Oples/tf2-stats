@@ -16,7 +16,10 @@ when(appType == "gui"):
     import nigui
     import nigui/msgbox
 
-var logger = newConsoleLogger(levelThreshold=lvlAll, fmtStr="[$time] - $levelname: ")
+
+var logger {.threadvar.} : ConsoleLogger
+
+logger = newConsoleLogger(levelThreshold=lvlAll, fmtStr="[$time] - $levelname: ")
 
 
 when(appType == "gui"):
@@ -205,6 +208,7 @@ proc getTF2Path*(): string =
             logger.log(lvlDebug, sLib)
 
         if TF2InstallPath.len == 1:
+            # Team Fortress 2 Install path found
             result = TF2InstallPath[0]
         else:
             if TF2InstallPath.len > 1:

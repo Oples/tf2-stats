@@ -14,7 +14,7 @@ import Player
 ##
 type
     Chat* = ref object
-        time: Time
+        time: DateTime
         spectator: bool
         dead: bool # (dead) the player wrote when he was dead
         team: bool # (team) message sent to team
@@ -24,7 +24,7 @@ type
 
 proc newMsg*(spectator: bool, dead: bool, team: bool, text: string, player: Player): Chat =
     new(result)
-    result.time = getTime()
+    result.time = now()
     result.spectator = spectator
     result.dead = dead
     result.team = team

@@ -30,12 +30,13 @@ type
         server_ip: string
         mm_id: string
         n_friends: int
-        tf2: Game
-        match: Match
+        tf2*: Game
+        match*: Match
         connecting: int
-        map: string
-        matchStart: bool
+        map*: string
+        matchStart*: bool
         onNewLine*: proc(self: TF2ConsoleLogger, line: string)
+        afterNewLine*: proc(self: TF2ConsoleLogger, line: string)
         onKill*: proc(self: TF2ConsoleLogger, k: Kill)
         onChatMessage*: proc(self: TF2ConsoleLogger, c: Chat)
         onClassSelected*: proc(self: TF2ConsoleLogger, c: TF2Class)
@@ -67,12 +68,18 @@ proc newTF2ConsoleLogger*(): TF2ConsoleLogger =
     result.onNewLine = proc(self: TF2ConsoleLogger, line: string) =
         #logger.log(lvlDebug, "onNewLine called! ", line)
         discard
+    result.afterNewLine = proc(self: TF2ConsoleLogger, line: string) =
+        #logger.log(lvlDebug, "afterNewLine called! ", line)
+        discard
     result.onKill = proc(self: TF2ConsoleLogger, k: Kill) =
-        logger.log(lvlInfo, "onKill called! ", k.toJson)
+        #logger.log(lvlInfo, "onKill called! ", k.toJson)
+        discard
     result.onChatMessage = proc(self: TF2ConsoleLogger, c: Chat) =
-        logger.log(lvlDebug, "onChatMessage called! ", c.toJson)
+        #logger.log(lvlDebug, "onChatMessage called! ", c.toJson)
+        discard
     result.onClassSelected = proc(self: TF2ConsoleLogger, c: TF2Class) =
-        logger.log(lvlInfo, "onClassSelected called! ", c)
+        #logger.log(lvlInfo, "onClassSelected called! ", c)
+        discard
     result.onConnectingServer = proc(self: TF2ConsoleLogger) =
         #logger.log(lvlDebug, "onConnectingServer called! ")
         discard
@@ -138,6 +145,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         #    saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
         self.match = self.tf2.newMatch(self.server_ip, self.map)
         self.matchStart = true
+
+        {.gcsafe.}:
+            self.onConnectingServer(self)
 
     elif self.tf2.match.len < 1:
         # no match was started
@@ -397,6 +407,8 @@ method runWatchdog*(self: TF2ConsoleLogger, filePath: string) {.base.} =
                 {.gcsafe.}:
                     self.onNewLine(self, line)
                 self.update_info(line)
+                {.gcsafe.}:
+                    self.afterNewLine(self, line)
 
         # Close the file object when you are done with it
         f.close()
