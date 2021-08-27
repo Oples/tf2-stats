@@ -14,10 +14,10 @@
 ## Development
 
 **3. Requirements**
- > nimble install regex
- > nimble install norm
- > nimble install nigui
- > nimble install ws
+ > nimble install regex<br/>
+ > nimble install norm<br/>
+ > nimble install nigui<br/>
+ > nimble install ws<br/>
 
 **4. Compile & Execute**
  > nim c -d:release -r src/main
@@ -29,3 +29,4 @@
 > - [nimble ws](https://github.com/treeform/ws)
 > - [Tachyons css](https://github.com/tachyons-css/tachyons/)
 > - [Glider js](https://github.com/NickPiscitelli/Glider.js)
+> - [Chart.js](https://github.com/chartjs/Chart.js)
