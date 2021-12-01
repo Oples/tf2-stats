@@ -24,13 +24,13 @@ type
         owner*: string
         fileCursor: int64
         players: int
-        max_players: int
+        maxPlayers: int
         build: string
         server_num: string
-        server_ip: string
+        serverIp: string
         mm_id: string
         n_friends: int
-        tf2*: Game
+        game*: Game
         match*: Match
         connecting: int
         map*: string
@@ -53,13 +53,13 @@ proc newTF2ConsoleLogger*(): TF2ConsoleLogger =
     result.owner = "" # YOUR NAME HERE!!! or blank for auto
     result.fileCursor = (int64) 0
     result.players = 0
-    result.max_players = 0
+    result.maxPlayers = 0
     result.build = ""
     result.server_num = ""
-    result.server_ip = ""
+    result.serverIp = ""
     result.mm_id = ""
     result.n_friends = 0
-    result.tf2 = newGame()
+    result.game = newGame()
     result.match = newMatch()
     # Connecting
     result.connecting = 0
@@ -101,10 +101,10 @@ proc newTF2ConsoleLogger*(): TF2ConsoleLogger =
 
 
 method `$`*(self: TF2ConsoleLogger): string {.base.} =
-    result = &"ip {self.server_ip}, map {self.map}"
+    result = &"ip {self.serverIp}, map {self.map}"
 
 
-method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
+method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
     var m: RegexMatch
 
     # don't even bother (usually spam bots send empty lines)
@@ -113,8 +113,8 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
 
     # Connecting to server
     elif line.match(re"^Connecting to (.*?)(?:\.\.\.){0,1}$", m):
-        self.server_ip = m.groupFirstCapture(0, line)
-        logger.log(lvlInfo, "CONNECTING TO: ", self.server_ip)
+        self.serverIp = m.groupFirstCapture(0, line)
+        logger.log(lvlInfo, "CONNECTING TO: ", self.serverIp)
         self.n_friends = 0
 
     elif line == "Team Fortress":
@@ -128,7 +128,7 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
     elif self.connecting == 2 and line.match(re"Players: ([0-9]+) / ([0-9]+)", m):
         self.connecting += 1
         #tf2.players = parseInt(m.groupFirstCapture(0, line))
-        self.tf2.currentMatch().maxPlayers = parseInt(m.groupFirstCapture(1, line))
+        self.game.currentMatch().maxPlayers = parseInt(m.groupFirstCapture(1, line))
 
     elif self.connecting == 3 and line.match(re"Build: ([0-9]+)", m):
         self.connecting += 1
@@ -143,13 +143,13 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
 
         #if match != cast[Match](nil):
         #    saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
-        self.match = self.tf2.newMatch(self.server_ip, self.map)
+        self.match = self.game.newMatch(self.serverIp, self.map)
         self.matchStart = true
 
         {.gcsafe.}:
             self.onConnectingServer(self)
 
-    elif self.tf2.match.len < 1:
+    elif self.game.match.len < 1:
         # no match was started
         return
 
@@ -406,7 +406,7 @@ method runWatchdog*(self: TF2ConsoleLogger, filePath: string) {.base.} =
                 #logger.log(lvlDebug, line)
                 {.gcsafe.}:
                     self.onNewLine(self, line)
-                self.update_info(line)
+                self.updateInfo(line)
                 {.gcsafe.}:
                     self.afterNewLine(self, line)
 

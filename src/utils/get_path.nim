@@ -109,12 +109,18 @@ proc getCustomConsoleLogPath*(): string =
     when(appType == "console"):
         while(result == ""):
             while(result == "" or not fileExists(result)):
-                echo "Custom location (console.log)"
+                echo "Custom log path (console.log)"
                 result = readLineFromStdin("$ ")
-                if not fileExists(result):
+                if result == "ls" or result.startsWith("ls "):
+                    # TODO: Add a parameter option for ls to list files in directories
+                    for pathWalk in walkFiles("*"):
+                      echo pathWalk
+                elif not fileExists(result):
                     echo "ERROR: File not found ", result
 
-            echo "Do you confirm this directory?"
+            echo ""
+            #echo "(The program will search for the console.log file or wait if it doesn't exist)" # TODO:
+            echo "Do you confirm this path?"
             stdout.write "\"" & result & "\" [Y/n] "
 
             let answer = getch()
