@@ -22,6 +22,11 @@
 **4. Compile & Execute**
  > nim c -d:release -r src/main
 
+**4bis. Development Compile & Execute**
+ > nim c -r src/web_server.nim
+
+then open http://localhost:9844
+
 ## Dependencies
 > - [nimble regex](https://github.com/nitely/nim-regex)
 > - nimble norm

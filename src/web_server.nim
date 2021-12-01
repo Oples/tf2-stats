@@ -171,7 +171,7 @@ proc runHTTPServer() {.thread.} =
                         updates.add(matchesLog["matches"][match])
                     var msg : string
                     for up in updates:
-                        msg.add(up.pretty)
+                        msg.add(up.pretty&",")
                     await ws.send(msg)
                     noMatches += 1
                     for up in noMatches..<currentNumMatch:
@@ -191,7 +191,7 @@ proc runHTTPServer() {.thread.} =
                         updates.add(killsLog[i])
                     var msg : string
                     for up in updates:
-                        msg.add(up.pretty)
+                        msg.add(up.pretty&",")
                     await ws.send(msg)
                     noMatches += 1
                     for up in noMatches..<currentNumMatch:
@@ -211,7 +211,7 @@ proc runHTTPServer() {.thread.} =
                         updates.add(chatLog[i])
                     var msg : string
                     for up in updates:
-                        msg.add(up.pretty)
+                        msg.add(up.pretty&",")
                     await ws.send(msg)
                     noMatches += 1
                     for up in noMatches..<currentNumMatch:
