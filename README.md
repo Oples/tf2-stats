@@ -40,12 +40,14 @@ nim c -d:release -d:strip --opt:speed --app:gui -r src/main
 ```
 
 
-## Development
+##4.1 Development
 
 To run a quick test execute the following command instead
 ```bash
 nim c -r src/web_server
 ```
+
+then open http://localhost:9844
 
 ## Dependencies
 > - [nimble regex](https://github.com/nitely/nim-regex)

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <!--
-    MIT License
-	Copyright (c) 2021 Copyright Holder All Rights Reserved.
+	Copyright (c) 2020 Oples MIT License
 -->
 <html lang="en" dir="ltr" class="h-100">
 	<head>
@@ -15,42 +14,42 @@
 		<meta name="author" content="Oples, Laykeen">
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Stats</title>
-		<script src="/jquery-3.6.0.min.js"></script>
-		<link rel="stylesheet" href="/tachyons.min.css">
-		<link rel="stylesheet" href="/master.css">
-		<link rel="stylesheet" href="/toastr.min.css">
-		<script src="/toastr.min.js"></script>
+		<script src="/js/jquery-3.6.0.min.js"></script>
+		<link rel="stylesheet" href="/css/tachyons.min.css">
+		<link rel="stylesheet" href="/css/master.css">
+		<link rel="stylesheet" href="/css/toastr.min.css">
+		<script src="/js/toastr.min.js"></script>
 		<script>
-
-		toastr.options = {
-		  "closeButton": true,
-		  "debug": false,
-		  "newestOnTop": true,
-		  "progressBar": true,
-		  "positionClass": "toast-top-right",
-		  "preventDuplicates": false,
-		  "onclick": null,
-		  "showDuration": "300",
-		  "hideDuration": "1000",
-		  "timeOut": "5000",
-		  "extendedTimeOut": "1000",
-		  "showEasing": "swing",
-		  "hideEasing": "linear",
-		  "showMethod": "fadeIn",
-		  "hideMethod": "fadeOut"
-		}
-
-	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
-	    socketm.onmessage = function (evt) {
-			try {
-				console.log(JSON.parse(evt.data).update);
-				//console.log(evt.data);
-			} catch (e) {
-				console.error(e);
-			}
-	   		toastr.success("NEW MATCH!");
-	    }
-	    </script>
+			toastr.options = {
+				"closeButton": true,
+				"debug": false,
+				"newestOnTop": true,
+				"progressBar": true,
+				"positionClass": "toast-top-right",
+				"preventDuplicates": false,
+				"onclick": null,
+				"showDuration": "300",
+				"hideDuration": "1000",
+				"timeOut": "5000",
+				"extendedTimeOut": "1000",
+				"showEasing": "swing",
+				"hideEasing": "linear",
+				"showMethod": "fadeIn",
+				"hideMethod": "fadeOut"
+			};
+		    let socket = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+		    //var out = document.getElementById("consoleOut");
+		    socket.onmessage = function (evt) {
+				let match = {};
+				try {
+					match = JSON.parse(evt.data);
+					toastr.success("New Match on "+match.map+" !");
+				} catch (err) {
+					console.warn("Invalid match data!", err, evt.data);
+					toastr.error("Invalid match received!");
+				}
+		    }
+		</script>
 	</head>
 
 		<body class="sans-serif near-white cover h-100">
@@ -202,6 +201,6 @@
   				</div>
   			</div>
   		</footer>
-  	<script src="fun.js" charset="utf-8"></script>
+  	<script src="/js/fun.js" charset="utf-8"></script>
   </body>
 </html>

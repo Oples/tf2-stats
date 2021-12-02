@@ -171,6 +171,7 @@ proc runHTTPServer() {.thread.} =
                         await ws.send($node)
                         logsRead = numLogsToRead
                     else: await sleepAsync(20)
+
                 else: await sleepAsync(20)
 
         elif req.url.path == "/hookKillWS":
