@@ -14,9 +14,80 @@
 		<meta name="author" content="Oples, Laykeen">
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Live!</title>
-		<link rel="stylesheet" href="tachyons.min.css">
-		<link rel="stylesheet" href="master.css">
-		<script src="Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
+		<script src="/jquery-3.6.0.min.js"></script>
+		<link rel="stylesheet" href="/tachyons.min.css">
+		<link rel="stylesheet" href="/master.css">
+		<link rel="stylesheet" href="/toastr.min.css">
+		<script src="/toastr.min.js"></script>
+		<script>
+
+		toastr.options = {
+		  "closeButton": true,
+		  "debug": false,
+		  "newestOnTop": true,
+		  "progressBar": true,
+		  "positionClass": "toast-top-right",
+		  "preventDuplicates": false,
+		  "onclick": null,
+		  "showDuration": "300",
+		  "hideDuration": "1000",
+		  "timeOut": "5000",
+		  "extendedTimeOut": "1000",
+		  "showEasing": "swing",
+		  "hideEasing": "linear",
+		  "showMethod": "fadeIn",
+		  "hideMethod": "fadeOut"
+		}
+
+	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketm.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+					toastr.clear();
+	   				toastr.info("Map: " + buffer[i].map);
+	   			}
+			} catch (e) {
+				console.error(e);
+			}
+	   		toastr.success("NEW MATCH!");
+	    }
+
+	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketc.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+	   				toastr.success(buffer[i].player + ": " + buffer[i].text);
+	   			}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	    }
+
+
+	    let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketk.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				for (i in buffer) {
+					console.log(buffer[i].actor.name + " killed " + buffer[i].target.name);
+					console.log(buffer[i]);
+	   				toastr.warning(buffer[i].actor.name + " killed " + buffer[i].target.name);
+	   			}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	   		//toastr.success("A KILL!");
+	    }
+	    </script>
 	</head>
 
 		<body class="sans-serif near-white cover h-100">
@@ -99,6 +170,7 @@
   				</div>
   			</div>
   		</footer>
+	<script src="Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
   	<script src="fun.js" charset="utf-8"></script>
 	<script src="charts.js" charset="utf-8"></script>
   </body>

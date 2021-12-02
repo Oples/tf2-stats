@@ -160,6 +160,7 @@ proc runHTTPServer() {.thread.} =
             var logsRead = 0
             while ws.readyState == Open:
                 if matchesLog.hasKey("matches"):
+                    if logsRead > matchesLog["matches"].len: logsRead = 0
                     let numLogsToRead = matchesLog["matches"].len
                     if numLogsToRead > logsRead:
                         var node = newJObject()
@@ -176,6 +177,7 @@ proc runHTTPServer() {.thread.} =
             var ws = await newWebSocket(req)
             var logsRead = 0
             while ws.readyState == Open:
+                if logsRead > killsLog.len: logsRead = 0
                 let numLogsToRead = killsLog.len
                 if numLogsToRead > logsRead:
                     var node = newJObject()
@@ -191,6 +193,7 @@ proc runHTTPServer() {.thread.} =
             var ws = await newWebSocket(req)
             var logsRead = 0
             while ws.readyState == Open:
+                if logsRead > chatLog.len: logsRead = 0
                 let numLogsToRead = chatLog.len
                 if numLogsToRead > logsRead:
                     var node = newJObject()
@@ -236,8 +239,11 @@ proc runHTTPServer() {.thread.} =
             while true:
                 let tmp = chanTF2Matches.tryRecv()
                 if tmp.dataAvailable:
+                    # Reset kills chat etc..
+                    killsLog = @[]
+                    chatLog = @[]
                     matchesLog = tmp.msg
-                else: await sleepAsync(40)
+                else: await sleepAsync(18)
 
         proc updateKills() {.async.} =
             while true:

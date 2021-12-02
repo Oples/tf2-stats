@@ -45,13 +45,13 @@ method toJson*(self: Kill): JsonNode {.base.} =
     ##{
     ##  "time": "",
     ##  "actor": {
-    ##    "name" : "Op",
+    ##    "name" : "Op1",
     ##    "altSide" : false,
     ##    "weapon" : "boom",
     ##    "crit" : true
     ##  },
     ##  "target": {
-    ##    "name" : "Op",
+    ##    "name" : "Op2",
     ##    "altSide" : true
     ##  }
     ##}
@@ -70,6 +70,6 @@ method toJson*(self: Kill): JsonNode {.base.} =
     target.add("altSide", newJBool(self.target_side))
 
     json_node.add("actor", actor)
-    json_node.add("target", actor)
+    json_node.add("target", target)
 
     return json_node
