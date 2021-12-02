@@ -1,3 +1,9 @@
+//                                                  #
+// Under MIT License                                #
+// Author: (c) 2021 Laykeen                         #
+// Original repo can be found at:                   #
+//      https://github.com/Oples/tf2-stats          #
+//                                                  #
 
 // Buttons "enumerator"
 const boxType = {

@@ -157,65 +157,53 @@ proc runHTTPServer() {.thread.} =
 
         elif req.url.path == "/hookMatchWS":
             var ws = await newWebSocket(req)
-            var noMatches = 0
-            var updates : seq[JsonNode]
-            if matchesLog.haskey "matches":
-                for m in matchesLog["matches"]:
-                    updates.add(m)
+            var logsRead = 0
             while ws.readyState == Open:
-                var currentNumMatch = 0
-                if matchesLog.haskey "matches":
-                    currentNumMatch = matchesLog["matches"].len
-                if currentNumMatch > noMatches:
-                    for match in noMatches..<currentNumMatch:
-                        updates.add(matchesLog["matches"][match])
-                    var msg : string
-                    for up in updates:
-                        msg.add(up.pretty&",")
-                    await ws.send(msg)
-                    noMatches += 1
-                    for up in noMatches..<currentNumMatch:
-                        updates.del(0)
+                if matchesLog.hasKey("matches"):
+                    if logsRead > matchesLog["matches"].len: logsRead = 0
+                    let numLogsToRead = matchesLog["matches"].len
+                    if numLogsToRead > logsRead:
+                        var node = newJObject()
+                        var msg = newJArray()
+                        for i in logsRead..<numLogsToRead:
+                            msg.add(matchesLog["matches"][i])
+                        node.add("update", msg)
+                        await ws.send($node)
+                        logsRead = numLogsToRead
+                    else: await sleepAsync(20)
+
                 else: await sleepAsync(20)
 
         elif req.url.path == "/hookKillWS":
             var ws = await newWebSocket(req)
-            var noMatches = 0
-            var updates : seq[JsonNode]
-            for m in killsLog:
-                updates.add(m)
+            var logsRead = 0
             while ws.readyState == Open:
-                var currentNumMatch = killsLog.len
-                if currentNumMatch > noMatches:
-                    for i in noMatches..<currentNumMatch:
-                        updates.add(killsLog[i])
-                    var msg : string
-                    for up in updates:
-                        msg.add(up.pretty&",")
-                    await ws.send(msg)
-                    noMatches += 1
-                    for up in noMatches..<currentNumMatch:
-                        updates.del(0)
+                if logsRead > killsLog.len: logsRead = 0
+                let numLogsToRead = killsLog.len
+                if numLogsToRead > logsRead:
+                    var node = newJObject()
+                    var msg = newJArray()
+                    for i in logsRead..<numLogsToRead:
+                        msg.add(killsLog[i])
+                    node.add("update", msg)
+                    await ws.send($node)
+                    logsRead = numLogsToRead
                 else: await sleepAsync(20)
 
         elif req.url.path == "/hookChatWS":
             var ws = await newWebSocket(req)
-            var noMatches = 0
-            var updates : seq[JsonNode]
-            for m in chatLog:
-                updates.add(m)
+            var logsRead = 0
             while ws.readyState == Open:
-                var currentNumMatch = chatLog.len
-                if currentNumMatch > noMatches:
-                    for i in noMatches..<currentNumMatch:
-                        updates.add(chatLog[i])
-                    var msg : string
-                    for up in updates:
-                        msg.add(up.pretty&",")
-                    await ws.send(msg)
-                    noMatches += 1
-                    for up in noMatches..<currentNumMatch:
-                        updates.del(0)
+                if logsRead > chatLog.len: logsRead = 0
+                let numLogsToRead = chatLog.len
+                if numLogsToRead > logsRead:
+                    var node = newJObject()
+                    var msg = newJArray()
+                    for i in logsRead..<numLogsToRead:
+                        msg.add(chatLog[i])
+                    node.add("update", msg)
+                    await ws.send($node)
+                    logsRead = numLogsToRead
                 else: await sleepAsync(20)
 
         elif req.url.path == "/":
@@ -252,8 +240,11 @@ proc runHTTPServer() {.thread.} =
             while true:
                 let tmp = chanTF2Matches.tryRecv()
                 if tmp.dataAvailable:
+                    # Reset kills chat etc..
+                    killsLog = @[]
+                    chatLog = @[]
                     matchesLog = tmp.msg
-                else: await sleepAsync(40)
+                else: await sleepAsync(18)
 
         proc updateKills() {.async.} =
             while true:
