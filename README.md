@@ -1,4 +1,4 @@
- # TF2 Stats
+# TF2 Stats
 
 ## Installation
 
@@ -21,8 +21,8 @@ must be installed.
 ```bash
 nimble install regex
 nimble install ws
-nimble install norm (W.I.P. optional)
-nimble install nigui (GUI requirement)
+nimble install norm # (W.I.P. optional)
+nimble install nigui # (GUI requirement)
 ```
 
 **4. Compile & Execute**
@@ -50,8 +50,8 @@ nim c -r src/web_server
 ## Dependencies
 > - [nimble regex](https://github.com/nitely/nim-regex)
 > - [nimble ws](https://github.com/treeform/ws)
-<!-- - [nimble norm] W.I.P. -->
-> - [nimble nigui (optional)]
+<!-- - [nimble norm](https://github.com/moigagoo/norm) W.I.P. -->
+> - [nimble nigui (optional)](https://nimble.directory/pkg/nigui)
 > - [JQuery js](https://jquery.com/)
 > - [Toastr js](https://github.com/CodeSeven/toastr)
 > - [Tachyons css](https://github.com/tachyons-css/tachyons/)
