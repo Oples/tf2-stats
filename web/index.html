@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <!--
+    MIT License
 	Copyright (c) 2021 Copyright Holder All Rights Reserved.
 -->
 <html lang="en" dir="ltr" class="h-100">
@@ -40,7 +41,6 @@
 		}
 
 	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
-	    //var out = document.getElementById("consoleOut");
 	    socketm.onmessage = function (evt) {
 			try {
 				console.log(JSON.parse(evt.data).update);
@@ -49,31 +49,6 @@
 				console.error(e);
 			}
 	   		toastr.success("NEW MATCH!");
-	    }
-
-	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
-	    //var out = document.getElementById("consoleOut");
-	    socketc.onmessage = function (evt) {
-			try {
-				console.log(JSON.parse(evt.data).update);
-			} catch (e) {
-				console.error(evt.data);
-				console.error(e);
-			}
-	   		//toastr.success("CHAT MESSAGE!");
-	    }
-
-
-	    let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
-	    //var out = document.getElementById("consoleOut");
-	    socketk.onmessage = function (evt) {
-			try {
-				//console.log(JSON.parse(evt.data).update);
-			} catch (e) {
-				console.error(evt.data);
-				console.error(e);
-			}
-	   		//toastr.success("A KILL!");
 	    }
 	    </script>
 	</head>
