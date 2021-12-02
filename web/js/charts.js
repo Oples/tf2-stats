@@ -30,11 +30,8 @@ function drawKillChart(dataset) {
         data.push(dataset[i].data);
     }
     // update the chart
-    let ctx = document.getElementById('kill_chart');
-    if (!ctx) {
-        return false;
-    }
-    ctx = ctx.getContext('2d');
+    let ctx = document.getElementById('kill_chart').getContext('2d');
+
     // https://www.chartjs.org/docs/latest/charts/bar.html
     let myChart = new Chart(ctx, {
         type: 'bar',
