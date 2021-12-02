@@ -40,15 +40,12 @@ nim c -d:release -d:strip --opt:speed --app:gui -r src/main
 ```
 
 
-## Development
+##4.1 Development
 
 To run a quick test execute the following command instead
 ```bash
 nim c -r src/web_server
 ```
-
-**4bis. Development Compile & Execute**
- > nim c -r src/web_server.nim
 
 then open http://localhost:9844
 
