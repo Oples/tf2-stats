@@ -263,6 +263,9 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug, "r.i.p. (team) message")
         logger.log(lvlDebug, "Player: ", pName)
         logger.log(lvlDebug, "Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     elif line.match(re"^\*DEAD\* (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -274,6 +277,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug, "r.i.p. message")
         logger.log(lvlDebug, "Player: ", pName)
         logger.log(lvlDebug, "Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
 
     elif line.match(re"^\(TEAM\) (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -285,6 +290,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug,"team message")
         logger.log(lvlDebug,"Player: ", pName)
         logger.log(lvlDebug,"Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
 
     elif line.match(re"^\*SPEC\* (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -293,6 +300,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         var msg : Chat = newMsg( true, false, false, message, say_player)
         logger.log(lvlInfo, line)
         self.match.addMsg(msg)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
 
     elif line.match(re"^(.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -301,6 +310,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         var msg : Chat = newMsg( false, true, false, message, say_player)
         logger.log(lvlInfo, line)
         self.match.addMsg(msg)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
 
     # Spagetti Code to find how many parties I have to throw
     # 70% of the time it's wrong BE CAREFUL OF THIS INFO

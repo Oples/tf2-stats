@@ -39,13 +39,43 @@
 		  "hideMethod": "fadeOut"
 		}
 
-    let socket = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
-    //var out = document.getElementById("consoleOut");
-    socket.onmessage = function (evt) {
-		console.log(JSON.parse(evt.data));
-   		toastr.success("NEW MATCH!");
-    }
-		</script>
+	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketm.onmessage = function (evt) {
+			try {
+				console.log(JSON.parse(evt.data).update);
+				//console.log(evt.data);
+			} catch (e) {
+				console.error(e);
+			}
+	   		toastr.success("NEW MATCH!");
+	    }
+
+	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketc.onmessage = function (evt) {
+			try {
+				console.log(JSON.parse(evt.data).update);
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	   		//toastr.success("CHAT MESSAGE!");
+	    }
+
+
+	    let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketk.onmessage = function (evt) {
+			try {
+				//console.log(JSON.parse(evt.data).update);
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	   		//toastr.success("A KILL!");
+	    }
+	    </script>
 	</head>
 
 		<body class="sans-serif near-white cover h-100">
