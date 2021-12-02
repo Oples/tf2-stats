@@ -15,9 +15,62 @@
 		<meta name="author" content="Oples, Laykeen">
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Live!</title>
+		<script src="/js/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
+		<script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/toastr.min.js"></script>
 		<link rel="stylesheet" href="/css/tachyons.min.css">
 		<link rel="stylesheet" href="/css/master.css">
-		<script src="/js/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
+		<script>
+
+		toastr.options = {
+		  "closeButton": true,
+		  "debug": false,
+		  "newestOnTop": true,
+		  "progressBar": true,
+		  "positionClass": "toast-top-right",
+		  "preventDuplicates": false,
+		  "onclick": null,
+		  "showDuration": "300",
+		  "hideDuration": "1000",
+		  "timeOut": "5000",
+		  "extendedTimeOut": "1000",
+		  "showEasing": "swing",
+		  "hideEasing": "linear",
+		  "showMethod": "fadeIn",
+		  "hideMethod": "fadeOut"
+		}
+
+	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketm.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+					toastr.clear();
+	   				toastr.info("Map: " + buffer[i].map);
+	   			}
+			} catch (e) {
+				console.error(e);
+			}
+	   		toastr.success("NEW MATCH!");
+	    }
+
+	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
+	    socketc.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+	   				toastr.success(buffer[i].player + ": " + buffer[i].text);
+	   			}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	    }
+
+	    </script>
 	</head>
 
 		<body class="sans-serif near-white cover h-100">
