@@ -193,7 +193,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         #    OWNER_deaths += 1
         #    logger.log(lvlInfo, OWNER, " deaths total: ", OWNER_deaths)
 
-    # sucide doesn't solve anything
+
+    # suicide doesn't solve anything
     elif line.match(re"^(.*) suicided.$", m) or line.match(re"^(.*) died.$", m):
         let sName = m.groupFirstCapture(0, line)
         logger.log(lvlInfo, sName, " called for Valhalla.")
@@ -224,7 +225,8 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
     elif line.match(re"^(?:.*[SM].*? ){0,1}(.*) was moved to the other team for game balance$", m):
         let pName = m.groupFirstCapture(0, line)
         var player = self.match.addPlayer(pName)
-        player.switchSide()
+
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
         logger.log(lvlDebug, pName , " team balance")
 
     # Team Balance
@@ -233,7 +235,7 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         let team = m.groupFirstCapture(2, line)
         var player = self.match.addPlayer(pName)
 
-        player.switchSide()
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
 
         if team == "RED":
             player.team = 1
@@ -249,7 +251,7 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
     elif line.match(re"^(?:.*[SM].*? ){0,1}(.*) was moved to the other team for game balance$", m):
         let pName = m.groupFirstCapture(0, line)
         var player = self.match.addPlayer(pName)
-        player.switchSide()
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
         logger.log(lvlDebug, pName, " team balance")
 
     # CHAT
@@ -344,10 +346,10 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
         for player_name in players:
             var player = self.match.addPlayer(player_name)
 
-            logger.log(lvlDebug, "team len(player.team_switch) ", len(player.team_switch))
+            logger.log(lvlDebug, "team len(player.teamBalance) ", len(player.teamSwitch))
             #echo "player: ", pretty(player.toJson())
             logger.log(lvlInfo, "PLAYER: ", player.name, " OF TEAM ", player.team," IS:")
-            if not (len(player.team_switch) mod 2 == 0):
+            if not (len(player.teamSwitch) mod 2 == 0):
                 if team == 2:
                     team = 3
                 if team == 3:
@@ -367,8 +369,6 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
     else:
         logger.log(lvlDebug, "-- IGNORED LINE")
         return
-
-    # Update the channel
 
 
 method runWatchdog*(self: TF2ConsoleLogger, filePath: string) {.base.} =
@@ -438,7 +438,7 @@ when isMainModule:
     #echo "Where: ", getAppFilename()
     echo ""
 
-    var TF2LogFilename = "console.log"
+    #var TF2LogFilename = "test/console.log"
     var filePath = ""
 
     when declared(commandLineParams):

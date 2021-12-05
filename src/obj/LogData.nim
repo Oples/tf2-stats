@@ -8,9 +8,10 @@ import std/[json]
 import Player
 import Chat
 import Kill
+import TeamSwitch
 
 ##
-## Generic data to log in chronological order
+## Generic Match data in **chronological** order
 ##
 type
     LogData* = ref object of RootObj
@@ -18,7 +19,7 @@ type
         ldPlayer : Player
         ldChat : Chat
         ldKill : Kill
-        #ldTeam : TeamBalance
+        ldTeamSwitch : TeamSwitch
 
 
 proc newLogData*(data : Chat) : LogData =
@@ -39,31 +40,50 @@ proc newLogData*(data : Player) : LogData =
     result.ldPlayer = data
 
 
-#[proc newLogData(data : TeamBalance) : LogData =
+proc newLogData*(data : TeamSwitch) : LogData =
     new(result)
     result.ldType = 3
-    result.ldTeam = data]#
+    result.ldTeamSwitch = data
 
 
 method toJson*(self: LogData): JsonNode {.base.} =
+    ##[
+    **Json sample**
+    ```json
+    {
+        "type": "player",
+        "data": {
+          "name": "oples",
+          "team": 1,
+          "teamSwitch": [0, 2]
+        }
+    }, {
+        "type": "ERROR",
+        "data": "An explenation of the Error"
+    }
+    ```
+    ]##
     result = newJObject()
     var data = newJObject()
 
     case self.ldType:
         of 0:
             data = self.ldChat.toJson()
-            result.add("type", newJString($type self.ldChat))
+            result.add("type", newJString("chat"))
             result.add("data", data)
         of 1:
             data = self.ldKill.toJson()
-            result.add("type", newJString($type self.ldKill))
+            result.add("type", newJString("kill"))
             result.add("data", data)
         of 2:
             data = self.ldPlayer.toJson()
-            result.add("type", newJString($type self.ldPlayer))
+            result.add("type", newJString("player"))
             result.add("data", data)
-        #of 3:
-        #    result = self.ldTeam.toJson()
+        of 3:
+            data = self.ldTeamSwitch.toJson()
+            result.add("type", newJString("teamSwitch"))
+            result.add("data", data)
+
         else:
             result.add("type", newJString("ERROR"))
-            result.add("data", newJString("Log obj not supported!"))
+            result.add("data", newJString("Log obj with id " & $self.ldType & " not supported!"))
