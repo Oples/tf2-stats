@@ -132,6 +132,8 @@ proc getCustomConsoleLogPath*(): string =
     when(appType == "gui"):
         getFileWindow()
 
+    logger.log(lvlDebug, "fp: " & result)
+
 
 proc getTF2Path*(): string =
     var
