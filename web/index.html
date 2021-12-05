@@ -42,8 +42,9 @@
 		    socket.onmessage = function (evt) {
 				let match = {};
 				try {
-					match = JSON.parse(evt.data);
-					toastr.success("New Match on "+match.map+" !");
+					match = JSON.parse(evt.data).update;
+					console.log(match);
+					toastr.success("New Match on "+match[0].map+" !");
 				} catch (err) {
 					console.warn("Invalid match data!", err, evt.data);
 					toastr.error("Invalid match received!");

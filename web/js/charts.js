@@ -4,22 +4,6 @@
 // Original repo can be found at:                   #
 //      https://github.com/Oples/tf2-stats          #
 //                                                  #
-let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
-socketk.onmessage = function (evt) {
-	try {
-		let buffer = JSON.parse(evt.data).update;
-		for (i in buffer) {
-			console.log(buffer[i].actor.name + " killed " + buffer[i].target.name);
-			console.log(buffer[i]);
-			toastr.warning(buffer[i].actor.name + " killed " + buffer[i].target.name);
-		}
-	} catch (e) {
-		console.error(evt.data);
-		console.error(e);
-	}
-	//toastr.success("A KILL!");
-}
-
 
 function drawKillChart(dataset) {
     // adapt received data to chartjs

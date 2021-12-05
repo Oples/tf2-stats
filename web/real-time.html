@@ -20,6 +20,7 @@
 		<script src="/js/toastr.min.js"></script>
 		<link rel="stylesheet" href="/css/tachyons.min.css">
 		<link rel="stylesheet" href="/css/master.css">
+		<link rel="stylesheet" href="/css/toastr.min.css">
 		<script>
 
 		toastr.options = {
@@ -70,6 +71,21 @@
 			}
 	    }
 
+		let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
+		socketk.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				for (i in buffer) {
+					console.log(buffer[i].actor + " killed " + buffer[i].target);
+					console.log(buffer[i]);
+					toastr.warning(buffer[i].actor + " killed " + buffer[i].target);
+				}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+			//toastr.success("A KILL!");
+		}
 	    </script>
 	</head>
 
