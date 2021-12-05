@@ -30,7 +30,6 @@ const WebDir = "web"
 logger = newConsoleLogger(levelThreshold=lvlDebug, fmtStr="[$time] - $levelname: ")
 
 
-
 proc createTestHtml(urlWS: string): string =
     result = """<html>
     <body>
@@ -174,6 +173,26 @@ proc runHTTPServer() {.thread.} =
 
                 else: await sleepAsync(20)
 
+
+        elif req.url.path == "/hookMatchEndWS":
+            var ws = await newWebSocket(req)
+            var logsRead = 0
+            while ws.readyState == Open:
+                if matchesLog.hasKey("matches"):
+                    if logsRead > matchesLog["matches"].len: logsRead = 0
+                    let numLogsToRead = matchesLog["matches"].len - 1
+                    if numLogsToRead > logsRead:
+                        var node = newJObject()
+                        var msg = newJArray()
+                        for i in logsRead..<numLogsToRead:
+                            msg.add(matchesLog["matches"][i])
+                        node.add("update", msg)
+                        await ws.send($node)
+                        logsRead = numLogsToRead
+                    else: await sleepAsync(20)
+                else: await sleepAsync(20)
+
+
         elif req.url.path == "/hookKillWS":
             var ws = await newWebSocket(req)
             var logsRead = 0
@@ -286,10 +305,11 @@ proc runHTTPServer() {.thread.} =
             echo "Error??????"
 
 
-proc startTF2Logger*() =
+proc startTF2Logger*(filePath: string) =
     var thr : array[0..1, Thread[void]]
 
     logger.log(lvlDebug, ":: Starting Treads ::")
+    FilePath = filePath
 
     chan.open()
     chanTF2Matches.open()
