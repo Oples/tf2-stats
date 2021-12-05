@@ -3,7 +3,9 @@
 ## Installation
 
 **1. Library**<br/>
-  <img src="docs/tf2-menu2.png" style="max-width:24em;width:100%;">
+  Open the Steam launcher and go to your LIBRARY
+
+  <img src="docs/tf2-menu2.png" style="width:24rem;">
 
 <br/><br/>
 **2. Properties**<br/>
@@ -15,7 +17,7 @@
 
 **3. Requirements**
 
-To be able to execute the project the following dependecies
+To be able to execute the project the following dependencies
 must be installed.
 
 ```bash
