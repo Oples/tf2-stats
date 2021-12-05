@@ -141,7 +141,6 @@ proc getTF2Path*(): string =
         steamPossibleLibraries : seq[string]
     let
         SteapApps = "steamapps"
-        LibraryLocationFile = "libraryfolders.vdf"
         TF2Common = "common" / "Team Fortress 2"
         TF2LogPath = "tf"
 
@@ -173,6 +172,8 @@ proc getTF2Path*(): string =
 
 
     if(dirExists(steamLauncherInstallPath)):
+        let LibraryLocationFile = "libraryfolders.vdf"
+
         # in the steam launcher get the library location file
         logger.log(lvlInfo, "Auto [success!]: found the Steam Launcher location\n")
         logger.log(lvlDebug, steamLauncherInstallPath,"\n")
@@ -196,7 +197,7 @@ proc getTF2Path*(): string =
             vdfSplit = vdfAll.split("\n")
 
             for vdfLine in vdfSplit:
-                if vdfLine.match(re"""^[\t: ]*?"[0-9]+"[\t: ]*?"(.*)"$""", m): #" # Atom syntax parser goes nuts with """
+                if vdfLine.match(re"""^[\t: ]*?"[0-9]+"[\t: ]*?"(.*)"$""", m):
                     steamPossibleLibraries.add(m.groupFirstCapture(0, vdfLine) / SteapApps)
 
         else:
