@@ -10,6 +10,7 @@ import rdstdin
 import logging
 import strutils
 import regex
+import std/strformat
 when defined(windows):
     import registry
 when(appType == "gui"):
@@ -18,9 +19,9 @@ when(appType == "gui"):
 
 
 var logger {.threadvar.} : ConsoleLogger
-
 logger = newConsoleLogger(levelThreshold=lvlAll, fmtStr="[$time] - $levelname: ")
 
+const ConsoleFName = "console.log"
 
 when(appType == "gui"):
     proc getFileWindow(): string =
@@ -54,14 +55,16 @@ when(appType == "gui"):
         window.add(container)
 
         var setupDescTextBox = newTextArea()
-        setupDescTextBox.editable = false
-        setupDescTextBox.text = ("""
-            WARNING! The Steam installation path was not found
-            or Team Fortress 2 is not installed
-
-            please select a `console.log` file to load it's contents!
-            """.unindent)
         container.add(setupDescTextBox)
+        setupDescTextBox.editable = false
+        setupDescTextBox.text = (fmt"""
+            WARNING!
+
+            The Steam installation path was not found or Team Fortress 2 is not installed
+
+            please select the `{ConsoleFName}` file to load it's contents!
+
+            """.unindent)
 
         var buttons = newLayoutContainer(Layout_Horizontal)
         buttons.widthMode = WidthMode_Fill
@@ -109,7 +112,7 @@ proc getCustomConsoleLogPath*(): string =
     when(appType == "console"):
         while(result == ""):
             while(result == "" or not fileExists(result)):
-                echo "Custom log path (console.log)"
+                echo fmt"Custom log path ({ConsoleFName})"
                 result = readLineFromStdin("$ ")
                 if result == "ls" or result.startsWith("ls "):
                     # TODO: Add a parameter option for ls to list files in directories
@@ -119,7 +122,7 @@ proc getCustomConsoleLogPath*(): string =
                     echo "ERROR: File not found ", result
 
             echo ""
-            #echo "(The program will search for the console.log file or wait if it doesn't exist)" # TODO:
+            #echo "(The program will search for the {ConsoleFName} file or wait if it doesn't exist)" # TODO:
             echo "Do you confirm this path?"
             stdout.write "\"" & result & "\" [Y/n] "
 
@@ -130,19 +133,19 @@ proc getCustomConsoleLogPath*(): string =
                 result = ""
 
     when(appType == "gui"):
-        getFileWindow()
+        result = getFileWindow()
 
-    logger.log(lvlDebug, "fp: " & result)
+    logger.log(lvlDebug, "manual log path: " & result)
 
 
 proc getTF2Path*(): string =
     var
         steamLauncherInstallPath: string
-        steamPossibleLibraries : seq[string]
     let
         SteapApps = "steamapps"
         TF2Common = "common" / "Team Fortress 2"
         TF2LogPath = "tf"
+        TF2SteamID = "440"
 
     logger.log(lvlInfo, "Trying to search for the Team Fortress 2 directory")
 
@@ -150,7 +153,7 @@ proc getTF2Path*(): string =
         var steamInstallDir: string
         # get hw key
         # https://github.com/coalpha/lang-archives/blob/master/nim/steam_install.nim
-        # ty coalpha
+        # thank you coalpha
         logger.log(lvlDebug, "(Windows) getting the Steam Launcher location")
         try:
             steamInstallDir = (
@@ -173,16 +176,20 @@ proc getTF2Path*(): string =
 
     if(dirExists(steamLauncherInstallPath)):
         let LibraryLocationFile = "libraryfolders.vdf"
+        var steamPossibleLibraries : seq[string]
 
         # in the steam launcher get the library location file
-        logger.log(lvlInfo, "Auto [success!]: found the Steam Launcher location\n")
-        logger.log(lvlDebug, steamLauncherInstallPath,"\n")
+        logger.log(lvlInfo, ":: Auto :: [success!]: found the Steam Launcher location")
+        logger.log(lvlInfo, "")
+        logger.log(lvlDebug, steamLauncherInstallPath)
+        logger.log(lvlDebug, "")
 
         steamPossibleLibraries.add(steamLauncherInstallPath)
 
         let libraryLocationPath = steamLauncherInstallPath / LibraryLocationFile
 
         logger.log(lvlDebug, "Checking ", LibraryLocationFile, " for other locations")
+        logger.log(lvlDebug, "")
         if fileExists(libraryLocationPath):
             # red the vdf file
             var libraryVdfFile : File
@@ -194,27 +201,47 @@ proc getTF2Path*(): string =
             vdfAll = readAll(libraryVdfFile)
             libraryVdfFile.close()
 
+            logger.log(lvlDebug, LibraryLocationFile & "\n", vdfAll)
             vdfSplit = vdfAll.split("\n")
 
+            var path = ""
             for vdfLine in vdfSplit:
-                if vdfLine.match(re"""^[\t: ]*?"[0-9]+"[\t: ]*?"(.*)"$""", m):
-                    steamPossibleLibraries.add(m.groupFirstCapture(0, vdfLine) / SteapApps)
+                if vdfLine.match(re"""^[\t ]*?"path"[\t: ]*?"(.*)".*?$""", m):
+                    path = m.groupFirstCapture(0, vdfLine)
+                    logger.log(lvlDebug, "Steam path: ", path)
+                    steamPossibleLibraries.add(path)
 
+                if vdfLine.match(re"""^[\t ]*?"([0-9]+)"[\t: ]*?"(.*)".*?$""", m):
+                    let appID = m.groupFirstCapture(0, vdfLine)
+                    #logger.log(lvlDebug, "app id: ", appID)
+                    if appID == TF2SteamID:
+                        # Make the possible TF2 path the first one in the search
+                        logger.log(lvlDebug, "")
+                        logger.log(lvlDebug, "Found the TF2 install folder in: ", path)
+                        steamPossibleLibraries.insert(path, 0)
+                        discard steamPossibleLibraries.pop()
         else:
             logger.log(lvlWarn, LibraryLocationFile, " is missing")
 
         var TF2InstallPath : seq[string]
 
+        logger.log(lvlDebug, "")
+        logger.log(lvlDebug, "Libraries found:")
         for sLib in steamPossibleLibraries:
-            logger.log(lvlDebug, sLib)
-            if dirExists(sLib  / TF2Common / TF2LogPath):
-                TF2InstallPath.add(sLib  / TF2Common / TF2LogPath)
+            logger.log(lvlDebug, "Lib: ", sLib)
+            let tf2ThericalPath = sLib / SteapApps / TF2Common / TF2LogPath
+            if dirExists(tf2ThericalPath):
+                if not fileExists(tf2ThericalPath / ConsoleFName):
+                    logger.log(lvlWarn, "File ", ConsoleFName, " NOT FOUND!")
+                else:
+                    TF2InstallPath.add(tf2ThericalPath / ConsoleFName)
 
-
-        logger.log(lvlDebug, "Libraries found:\n")
-
+        # logging
+        logger.log(lvlDebug, "")
+        logger.log(lvlDebug, "Absolute path of " & ConsoleFName)
         for sLib in TF2InstallPath:
             logger.log(lvlDebug, sLib)
+        logger.log(lvlDebug, "")
 
         if TF2InstallPath.len == 1:
             # Team Fortress 2 Install path found
@@ -222,17 +249,27 @@ proc getTF2Path*(): string =
         else:
             if TF2InstallPath.len > 1:
                 # ambiguity multiple installs or none?
-                logger.log(lvlWarn, "Auto fetch found Steam and Multiple TF2 folders")
+                logger.log(lvlWarn, "")
+                logger.log(lvlWarn, "Auto fetch found multiple TF2 folders!")
+                logger.log(lvlWarn, "Falling back to manual input")
+                logger.log(lvlWarn, "")
                 #raise newException(RangeDefect , "Ambiguity error: Multiple installs detected!")
             else:
+                logger.log(lvlError, "")
                 logger.log(lvlError, "Auto fetch found Steam but not the game")
                 logger.log(lvlError, "Is the game even installed?")
+                logger.log(lvlError, "Anyway fallback to manual input ¯\\_(ツ)_/¯")
+                logger.log(lvlError, "")
                 #raise newException(RangeDefect , "The Team Fortress 2 folder was not found!")
 
             result = getCustomConsoleLogPath()
 
     else:
-        logger.log(lvlWarn, "No Steam Launcher path found")
+        logger.log(lvlDebug, "Steam path: ", steamLauncherInstallPath)
+        logger.log(lvlWarn, "")
+        logger.log(lvlWarn, "The Steam Launcher was not found")
+        logger.log(lvlWarn, "Falling back to manual input")
+        logger.log(lvlWarn, "")
         result = getCustomConsoleLogPath()
 
 
