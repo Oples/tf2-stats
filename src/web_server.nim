@@ -9,7 +9,7 @@ import std/[os, json, logging, times, mimetypes]
 import ws
 import tail_console
 import obj/[Game, Kill, Chat]
-
+import std/browsers
 
 ##[
   Guide:
@@ -23,7 +23,7 @@ var
     chanTF2Matches : Channel[JsonNode]
     chanTF2Kills : Channel[JsonNode]
     chanTF2Chat : Channel[JsonNode]
-var port = 9844.Port
+var WebPort = 9844
 var FilePath* = ""
 const WebDir = "web"
 
@@ -244,7 +244,7 @@ proc runHTTPServer() {.thread.} =
             except:
                 await req.respond(Http404, "Not found")
 
-    server.listen port
+    server.listen WebPort.Port
 
     proc listenerHTTP {.async.} =
         while true:
@@ -325,7 +325,8 @@ proc startTF2Logger*(filePath: string) =
     else:
         createThread(thr[0], tf2logger)
 
-
+    when(appType == "gui"):
+        openDefaultBrowser("http://127.0.0.1:" & $WebPort)
     joinThreads thr
     chan.close()
 
