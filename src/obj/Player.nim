@@ -5,37 +5,10 @@
 #      https://github.com/Oples/tf2-stats          #
 #                                                  #
 import std/[json, times, deques]
+import TeamSwitch
+import ../utils/teamCalc
 
-
-proc oscillate*(num: int):int =
-    if (num mod 2 == 0):
-        return num - 1 # team A
-    else:
-        return num + 1 # team B
-
-
-##
-## Team Balance
-##
-type
-    TeamBalance* = ref object
-        time: Time
-
-method toJson*(self: TeamBalance): JsonNode {.base.} =
-    result = newJObject()
-    result.add("time", newJString($self.time))
-
-type
-    TeamSwitch* = ref object
-        time: Time
-
-method toJson*(self: TeamSwitch): JsonNode {.base.} =
-    result = newJObject()
-    result.add("time", newJString($self.time))
-
-##
-##   Player class
-##
+## Player card
 type
     Player* = ref object
         name*: string
@@ -46,23 +19,42 @@ type
             2: B # Unknown B
             else: Unknown
         ]#
-        teamBalance*: seq[TeamBalance]
         teamSwitch*: seq[TeamSwitch]
         kills*: seq[Player]
         team_kills*: seq[Player]
         killed*: seq[Player]
-        team_killed*: seq[Player]
+        teamKilled*: seq[Player]
 
 
 method toJson*(self: Player): JsonNode {.base.} =
+    ##[
+    - **name** is the ID of the player
+    - **team** the team the player joined as
+    - **teamSwitch** list of the player's team switch or team balance
+    ```json
+    {
+        "name" : "oples",
+        "team" : 1,
+        "teamSwitch" : [
+            {
+                "time" : "",
+                "teamBalance" : false
+            }
+        ]
+    }
+    ```
+    ]##
     var json_node = newJObject()
     json_node.add("name", newJString(self.name))
     json_node.add("team", newJInt(self.team))
 
     var arr = newJArray()
-    for teamBalance in self.teamBalance:
-        arr.add(newJString($(teamBalance.time.utc)))
-    json_node.add("teamBalance", arr)
+    for teamSwitch in self.teamSwitch:
+        var teamSObj = newJObject()
+        teamSObj.add("time", newJString($(teamSwitch.time.utc)))
+        teamSObj.add("teamBalance", newJBool(teamSwitch.teamBalance))
+        arr.add(teamSObj)
+    json_node.add("teamSwitch", arr)
     #[arr = newJArray()
     for p in self.kills:
         arr.add(newJString(p.name))
@@ -76,9 +68,9 @@ method toJson*(self: Player): JsonNode {.base.} =
         arr.add(newJString(p.name))
     json_node.add("killed", arr)
     arr = newJArray()
-    for p in self.team_killed:
+    for p in self.teamKilled:
         arr.add(newJString(p.name))
-    json_node.add("team_killed", arr)]#
+    json_node.add("teamKilled", arr)]#
 
     return json_node
 
@@ -87,27 +79,26 @@ proc newPlayer*(name: string): Player =
     new(result)
     result.name = name
     result.team = 0
-    result.teamBalance = @[]
     result.teamSwitch = @[]
     result.kills = @[]
     result.team_kills = @[]
-    result.team_killed = @[]
+    result.teamKilled = @[]
 
 
 method newDeath*(self: var Player, player: var Player) {.base.} =
-    if (len(self.teamBalance) mod 2) == (len(player.teamBalance) mod 2):
+    if (len(self.teamSwitch) mod 2) == (len(player.teamSwitch) mod 2):
         if not self.killed.contains(player):
             self.killed.add(player)
     else:
         # odd teams switch means opposite team
-        if not self.team_killed.contains(player):
-            self.team_killed.add(player)
+        if not self.teamKilled.contains(player):
+            self.teamKilled.add(player)
 
 
 method newKill*(self: var Player, player: var Player) {.base.} =
     player.newDeath(self)
 
-    if (len(self.teamBalance) mod 2) == (len(player.teamBalance) mod 2):
+    if (len(self.teamSwitch) mod 2) == (len(player.teamSwitch) mod 2):
         if not self.kills.contains(player):
             self.kills.add(player)
     else:
@@ -117,12 +108,18 @@ method newKill*(self: var Player, player: var Player) {.base.} =
 
 
 # Team Balance
-method switchSide*(self: var Player) {.base.} =
-    var team_balance: TeamBalance = TeamBalance(time: getTime())
-    self.teamBalance.add(team_balance)
+method switchSide*(self: var Player, teamBalance = false): TeamSwitch {.base.} =
+    ## Make the player switch teams
+    ## **Note:**
+    ## This affects the `kills` and `team_kills` as well as `killed` and `teamKilled`
+    let tmb: TeamSwitch = TeamSwitch(
+                    player: self.name, time: getTime(), teamBalance: teamBalance)
+    self.teamSwitch.add(tmb)
+    return tmb
 
 
 method setKillsTeam*(self: var Player, team: int) {.base.} =
+    ## Set the teams of the killed players by the player
     for p in self.kills:
         if p.team == 0 or team < p.team:
             p.team = team
@@ -132,15 +129,17 @@ method setKillsTeam*(self: var Player, team: int) {.base.} =
 
 
 method setTeamKillsTeam(self: var Player, team: int) {.base.} =
+    ## Set the teams of the killed players (ex-teamates) by the player
     for p in self.team_kills:
         if p.team == 0 or team < p.team:
             p.team = team
-    for p in self.team_killed:
+    for p in self.teamKilled:
         if p.team == 0 or team < p.team:
             p.team = team
 
 
 method propagateTeams*(self: var Player): bool {.base.} =
+    ## Propagate the teams to the players linked to self
     var visited : seq[Player] = @[self]
     var queue : Deque[Player] = initDeque[Player]()
     var cursor = self
@@ -172,7 +171,7 @@ method propagateTeams*(self: var Player): bool {.base.} =
             if not visited.contains(p):
                 visited.add(p)
                 queue.addFirst(p)
-        for p in self.team_killed:
+        for p in self.teamKilled:
             if not visited.contains(p):
                 visited.add(p)
                 queue.addFirst(p)
@@ -208,7 +207,7 @@ method updatePropagate*(self: var Player):bool {.base.} =
             if not visited.contains(p):
                 visited.add(p)
                 queue.addFirst(p)
-        for p in self.team_killed:
+        for p in self.teamKilled:
             if not visited.contains(p):
                 visited.add(p)
                 queue.addFirst(p)

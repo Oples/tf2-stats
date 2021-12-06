@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<!--
+    MIT License
+	Copyright (c) 2021 Copyright Holder All Rights Reserved.
+-->
+<html lang="en" dir="ltr" class="h-100">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="theme-color" content="#293446">
+		<!-- Add to homescreen -->
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="description" content="tf2 hats gen">
+		<meta name="author" content="Oples, Laykeen">
+		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
+		<title>TF2 Live!</title>
+		<script src="/js/Chart.min.js" integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="></script>
+		<script src="/js/jquery-3.6.0.min.js"></script>
+		<script src="/js/toastr.min.js"></script>
+		<link rel="stylesheet" href="/css/tachyons.min.css">
+		<link rel="stylesheet" href="/css/master.css">
+		<link rel="stylesheet" href="/css/toastr.min.css">
+		<script>
+
+		toastr.options = {
+		  "closeButton": true,
+		  "debug": false,
+		  "newestOnTop": true,
+		  "progressBar": true,
+		  "positionClass": "toast-top-right",
+		  "preventDuplicates": false,
+		  "onclick": null,
+		  "showDuration": "300",
+		  "hideDuration": "1000",
+		  "timeOut": "5000",
+		  "extendedTimeOut": "1000",
+		  "showEasing": "swing",
+		  "hideEasing": "linear",
+		  "showMethod": "fadeIn",
+		  "hideMethod": "fadeOut"
+		}
+
+	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+	    //var out = document.getElementById("consoleOut");
+	    socketm.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+					toastr.clear();
+	   				toastr.info("Map: " + buffer[i].map);
+	   			}
+			} catch (e) {
+				console.error(e);
+			}
+	   		toastr.success("NEW MATCH!");
+	    }
+
+	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
+	    socketc.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				//console.log();
+				for (i in buffer) {
+	   				toastr.success(buffer[i].player + ": " + buffer[i].text);
+	   			}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+	    }
+
+		let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
+		socketk.onmessage = function (evt) {
+			try {
+				let buffer = JSON.parse(evt.data).update;
+				for (i in buffer) {
+					console.log(buffer[i].actor + " killed " + buffer[i].target);
+					console.log(buffer[i]);
+					toastr.warning(buffer[i].actor + " killed " + buffer[i].target);
+				}
+			} catch (e) {
+				console.error(evt.data);
+				console.error(e);
+			}
+			//toastr.success("A KILL!");
+		}
+	    </script>
+	</head>
+
+		<body class="sans-serif near-white cover h-100">
+			<div class="flex bg-img flex-column min-h-100">
+				<div class="mw-90 mw7 center pv3 fg1" role="main">
+
+					<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+
+						<div id="title-header" class="dt-ns dt--fixed w-100">
+							<div class="dtc-l">
+								<h1 class="fw10 f2 truncate orange mv1">Real&#8482; Time&#8482;</h1>
+							</div>
+							<div class="dtc-l">
+								<h2 class="f3 fw1 tr-l mv1 truncate">Owner&#8482;</h2>
+							</div>
+						</div>
+
+						<div class="bg-white mv2" style="height:2px"></div>
+
+						<div class="bg-mid-gray pa3 br2 mt3">
+							<div class="dt w-100 dt--fixed">
+								<div class="dt-row">
+									<div class="dtc">
+										<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.TbPCzr-WK4QeuauAu77FaAHaFj%26pid%3DApi&f=1" alt=""/>
+									</div>
+									<div class="dtc">
+										<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2Fif-2M3K1tqk%2Fhqdefault.jpg&f=1&nofb=1" alt="">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="bg-mid-gray ph3 pv2 br2 mt3">
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">Current team:</dt>
+						    <dd class="dib ml0 white-70 red">RED&#8482;</dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">Autobalanced:</dt>
+						    <dd class="dib ml0 white-70">2 times&#8482;</dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">ip:</dt>
+						    <dd class="dib ml0 white-70">127.0.0.1&#8482;</dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">Current class:</dt>
+						    <dd class="dib ml0 white-70"></dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">Kills:</dt>
+						    <dd class="dib ml0 white-70">123&#8482;</dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">Deaths:</dt>
+						    <dd class="dib ml0 white-70">123</dd>
+						  </dl>
+							<dl class="lh-title mv2">
+						    <dt class="dib light-gray b">N&deg; players:</dt>
+						    <dd class="dib ml0 white-70">32 / 32</dd>
+						  </dl>
+
+						  <canvas id="kill_chart"></canvas>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+
+  		<footer class="bg-dark-gray white-80 pv4 ph5">
+  			<div class="f5">
+  				<div class="dib mb2 mb0-l">
+  					This project is under the
+  					<a rel="license" href="https://mit-license.org/" class="link light-blue">
+  						MIT License
+  					</a>
+  				</div>
+  				<div class="fr-l">
+  					<a href="https://github.com/Oples/tf2-stats" class="link light-blue">TF2 Stats GitHub</a>
+  				</div>
+  			</div>
+  		</footer>
+  	<script src="/js/fun.js" charset="utf-8"></script>
+	<script src="/js/charts.js" charset="utf-8"></script>
+  </body>
+</html>

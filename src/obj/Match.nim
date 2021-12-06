@@ -4,18 +4,18 @@
 # Original repo can be found at:                   #
 #      https://github.com/Oples/tf2-stats          #
 #                                                  #
-import std/[json, times]
+import std/[json, times, sequtils]
 import Player
 import Chat
 import Kill
 import Weapon
+import TeamSwitch
 import LogData
 
-##
-##  Match class
-##
+
 type
     Match* = ref object
+        ##  Match class
         ip: string
         map*: string
         time*: DateTime
@@ -56,75 +56,115 @@ method toJson*(self: Match): JsonNode {.base.} =
             side B (even numbers) = BLU
         side: true
 
+
+    Minimum requirements to meet for the frontend Match Update
     ```json
     {
-        "time": "",
         "ip" : "127.0.0.1",
         "map" : "ctf_hydro",
-        "players" : 16,
-        "side" : false,
-        "chat" : [{
-                "spectator" : false,
-                "dead" : true,
-                "team" : true,
-                "player" : "Oples"
-                "text" : "gg"
-            }],
-        "kills" : [{
-            "time": "",
-            "actor": {
-                "name" : "OplesBot 2.0",
-                "altSide" : false,
-                "weapon" : "sniper_rifle",
-                "crit" : true
-            },
-            "target": {
-                "name" : "Oples",
-                "altSide" : false
+        "switchSide" : false,
+        "players" : {
+            "oples" : {
+                "team" : 1,
+                "teamBalance" : [0, 1 , 2],
+                "kills" : [
+                    {
+                        "weapon" : "quake_rl",
+                        "crit" : false,
+                        "target" : "laykeenNoob"
+                    }
+                ],
+                "deaths" : [
+                    {
+                        "weapon" : "quake_rl",
+                        "crit" : false,
+                        "target" : "laykeenNoob"
+                    }
+                ],
+                "chat" : [
+                    {
+                        "dead" : false,
+                        "spectator" : false,
+                        "team" : true,
+                        "text" : "gg"
+                    }
+                ]
             }
-        }],
-        "log" : [{
-            "event" : "Kill",
-            "data" : {
-                "time": "",
-                "actor": {
-                    "name" : "OplesBot 2.0",
-                    "altSide" : false,
-                    "weapon" : "sniper_rifle",
-                    "crit" : true
-                },
-                "target": {
-                    "name" : "Oples",
-                    "altSide" : false
+        },
+        "log" : [
+            {
+                "type" : "player",
+                "data" : {
+                    "name" : "oples",
+                    "team" : 1,
+                    "teamBalance" : [0, 2]
                 }
             },
-        }]
+            {
+                "type" : "chat",
+                "data" : {
+                    "dead" : false,
+                    "spectator" : false,
+                    "team" : true,
+                    "player" : "oples",
+                    "text" : "gg"
+                }
+            },
+            {
+                "type" : "teamBalance",
+                "data" : {
+                    "player" : "oples",
+                }
+            },
+            {
+                "type" : "kill",
+                "data" : {
+                    "actor" : "laykeen",
+                    "crit" : true,
+                    "weapon" : "quack_rl",
+                    "target" : "oples"
+                }
+            },
+            {
+                "type" : "ERROR",
+                "data" : "An explenation of the Error"
+            }
+        ]
     }
     ```
     ]##
     var json_node = newJObject()
-    json_node.add("time", newJString($self.time.utc))
+    # TODO: ORM to save the time (only in real-time)
+    #json_node.add("time", newJString($self.time.utc))
     json_node.add("ip", newJString(self.ip))
     json_node.add("map", newJString(self.map))
-    var obj = newJObject()
+    json_node.add("switchSide", newJBool(self.side))
+
+    var pList_obj = newJObject()
     for p in self.players:
-        var team = newJInt(p.team)
-        if not (len(p.team_switch) mod 2) == 0:
-            team = newJInt(oscillate(p.team))
-        obj.add(p.name, team)
-    json_node.add("players", obj)
-    json_node.add("side", newJBool(self.side))
-    var arr = newJArray()
-    for c in self.chat:
-        arr.add(c.toJson())
-    json_node.add("chat", arr)
-    arr = newJArray()
-    #for k in self.kills:
-    #    arr.add(k.toJson())
-    #json_node.add("kills", arr)
+
+        var p_obj = newJObject()
+        p_obj.add("team", newJInt(p.team))
+
+        var p_balance = newJArray()
+        for balance in p.teamSwitch:
+            p_balance.add(balance.toJson)
+        p_obj.add("teamSwitch", p_balance)
+
+        var p_kills = newJArray()
+        for k in p.kills.concat(p.teamKills):
+            p_kills.add(k.toJson)
+        p_obj.add("kills", p_kills)
+
+        pList_obj.add(p.name, p_obj)
+
+    json_node.add("players", pList_obj)
+
+    var log = newJArray()
     for l in self.log:
-        arr.add(l.toJson())
-    json_node.add("log", arr)
+        log.add(l.toJson())
+    json_node.add("log", log)
+
     return json_node
 
 
@@ -190,11 +230,19 @@ method addMsg*(self: var Match, msg: Chat) {.base.} =
     self.log.add(newLogData(msg))
 
 
+#method addTeamBalance*(self: var Match, tmb: TeamSwitch) {.base.} =
+#    self.log.add(newLogData(tmb))
+
+
+method addTeamSwitch*(self: var Match, tms: TeamSwitch) {.base.} =
+    self.log.add(newLogData(tms))
+
+
 method switchSide*(self: var Match) {.base.} =
     for p in self.players:
         var player:Player = p
-        player.switchSide()
-
+        # THIS IS NOT A TEAM BALANCE!
+        self.addTeamSwitch(player.switchSide(teamBalance = false))
 
 method printChat*(self: Match) {.base.} =
     for msg in self.chat:

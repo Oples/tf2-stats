@@ -8,5 +8,4 @@ import web_server
 import utils/get_path
 
 when isMainModule:
-    FilePath = getTF2Path()
-    startTF2Logger()
+    startTF2Logger(getTF2Path())

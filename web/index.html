@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-	Copyright (c) 2021 Copyright Holder All Rights Reserved.
+	Copyright (c) 2020 Oples MIT License
 -->
 <html lang="en" dir="ltr" class="h-100">
 	<head>
@@ -10,55 +10,220 @@
 		<meta name="theme-color" content="#293446">
 		<!-- Add to homescreen -->
 		<meta name="mobile-web-app-capable" content="yes">
-		<meta name="description" content="tf2 hats gen">
+		<meta name="description" content="tf2 Logger main page">
 		<meta name="author" content="Oples, Laykeen">
 		<!-- More info: https://developer.chrome.com/multidevice/android/installtohomescreen -->
 		<title>TF2 Stats</title>
-		<link rel="stylesheet" href="tachyons.min.css">
-		<link rel="stylesheet" href="animate.min.css">
-		<link rel="stylesheet" href="master.css">
+		<script src="/js/jquery-3.6.0.min.js"></script>
+		<link rel="stylesheet" href="/css/tachyons.min.css">
+		<link rel="stylesheet" href="/css/master.css">
+		<link rel="stylesheet" href="/css/toastr.min.css">
+		<script src="/js/toastr.min.js"></script>
+		<script>
+			toastr.options = {
+				"closeButton": true,
+				"debug": false,
+				"newestOnTop": true,
+				"progressBar": true,
+				"positionClass": "toast-top-right",
+				"preventDuplicates": false,
+				"onclick": null,
+				"showDuration": "300",
+				"hideDuration": "1000",
+				"timeOut": "5000",
+				"extendedTimeOut": "1000",
+				"showEasing": "swing",
+				"hideEasing": "linear",
+				"showMethod": "fadeIn",
+				"hideMethod": "fadeOut"
+			};
+			/*
+				"ip" : "127.0.0.1",
+			    "map" : "ctf_hydro",
+			    "switchSide" : false,
+			    "players" : [
+			        "oples" : {
+			            "team" : 1,
+			            "teamBalance" : [0, 1 , 2],
+			            "kills" : [
+			                {
+			                    "weapon" : "quake_rl",
+			                    "crit" : false,
+			                    "target" : "laykeenNoob"
+			                }
+			            ],
+			            "deaths" : [
+			                {
+			                    "weapon" : "quake_rl",
+			                    "crit" : false,
+			                    "target" : "laykeenNoob"
+			                }
+			            ],
+			            "chat" : [
+			                {
+			                    "dead" : false,
+			                    "spectator" : false,
+			                    "team" : true,
+			                    "text" : "gg"
+			                }
+			            ]
+			        }
+			    ],
+			    "log" : [
+			        {
+			            "type" : "player",
+			            "data" : {
+			                "name" : "oples",
+			                "team" : 1,
+			                "teamBalance" : [0, 2]
+			            }
+			        },
+			        {
+			            "type" : "chat",
+			            "data" : {
+			                "dead" : false,
+			                "spectator" : false,
+			                "team" : true,
+			                "player" : "oples",
+			                "text" : "gg"
+			            }
+			        },
+			        {
+			            "type" : "teamBalance",
+			            "data" : {
+			                "player" : "oples",
+			            }
+			        },
+			        {
+			            "type" : "kill",
+			            "data" : {
+			                "actor" : "laykeen",
+			                "crit" : true,
+			                "weapon" : "quack_rl",
+			                "target" : "oples"
+			            }
+			        },
+			        {
+			            "type" : "ERROR",
+			            "data" : "An explenation of the Error"
+			        }
+			    ]
+			}
+			*/
+			const mapsMap = {
+				pl_pier: {
+					bg: "pier",
+					label: "Pier"
+				}
+			};
+			let currentPlayer = "Oples";
+		    let socket = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+		    socket.onmessage = (evt) => {
+				try {
+					let matches = JSON.parse(evt.data).update;
+					console.log(matches);
+					for (var round in matches) {
+						if (matches.hasOwnProperty(round)) {
+							toastr.success("New Match on " + matches[round].map + " !");
+						}
+					}
+					showMatches(matches);
+				} catch (err) {
+					console.warn("Invalid match data!", err, evt.data);
+					toastr.error("Invalid match received!");
+				}
+		    }
+			const showMatches = (matches) => {
+				const $matchList = $("#matches-history");
+				for (var round of matches) {
+					const $matchElem = $matchList.children().first().clone();
+					if (mapsMap.hasOwnProperty(round.map)) {
+						$matchElem.removeClass("bg-tf2-map-dustbowl");
+						$matchElem.addClass("bg-tf2-map-"+mapsMap[round.map].bg);
+						$matchElem.find(".match-map").text(mapsMap[round.map].label);
+					}
+					$matchElem.find(".match-ip").text(round.ip || "...");
+					$matchElem.removeClass("dn");
+					$matchList.append($matchElem, $matchElem);
+				}
+			};
+		</script>
 	</head>
 
-		<body class="sans-serif near-white cover h-100">
-			<div class="flex bg-img flex-column min-h-100">
-				<div class="mw-90 mw7 center pv3 fg1" role="main">
-					<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
-						<div id="title-header" class="dt-ns dt--fixed w-100">
-							<div class="dtc-l">
-								<h1 class="fw10 f2 truncate orange mv1">History</h1>
-							</div>
-							<div class="dtc-l">
-								<h2 class="f3 fw1 tr-l mv1 truncate">Owner</h2>
-							</div>
+	<body class="sans-serif near-white cover h-100">
+		<div class="flex bg-img flex-column min-h-100">
+			<div class="mw-90 mw7 center pv3 fg1" role="main">
+
+				<div class="bg-dark-gray pa3 pa4-l mh4-l center br1">
+
+					<div id="title-header" class="dt-ns dt--fixed w-100">
+						<div class="dtc-l">
+							<a href="real-time.html" class="link"><h1 class="fw10 f2 truncate orange mv1">Real Time</h1></a>
 						</div>
+						<div class="dtc-l">
+							<h2 class="f3 fw1 tr-l mv1 truncate">Owner</h2>
+						</div>
+					</div>
 
-						<div class="bg-white mv2" style="height:2px"></div>
+					<hr class="bg-white mv2" style="height:1px" />
 
-						<div class="bg-mid-gray pa3 br2 mt3">
+					<div class="bg-mid-gray pa3 br2 mt3">
+						<div class="dt w-100 dt--fixed">
+							<a href="real-time.html">
+								<div class="dt-row">
+									<div class="dtc">
+										<!--img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse3.mm.bing.net%2Fth%3Fid%3DOIP.TbPCzr-WK4QeuauAu77FaAHaFj%26pid%3DApi&f=1" alt=""/-->
+									</div>
+									<div class="dtc">
+										<!--img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.ytimg.com%2Fvi%2Fif-2M3K1tqk%2Fhqdefault.jp g&f=1&nofb=1" alt=""-->
+									</div>
+								</div>
+							</a>
+						</div>
+					</div>
+
+					<div id="title-header" class="mt3 dt-ns dt--fixed w-100">
+						<div class="dtc-l">
+							<h1 class="fw10 f2 truncate orange mv1">History</h1>
+						</div>
+					</div>
+
+					<hr class="bg-white mv2" style="height:1px" />
+
+					<ul id="matches-history" class="list pl0">
+						<li class="bg-mid-gray bg-tf2-map-dustbowl bg-right pa3 br2 mt3 dn">
 							<div class="dt w-100 dt--fixed">
 								<div class="dt-row">
 									<dl class="lh-title mv2">
-								    <dt class="dib light-gray b">Map:</dt>
-								    <dd class="dib ml0 white-70">Dustbowl</dd>
-								  </dl>
+									    <dt class="dib light-gray b">Map:</dt>
+									    <dd class="dib ml0 white-70 match-map">Dustbowl</dd>
+									</dl>
 									<dl class="lh-title mv2">
-								    <dt class="dib light-gray b">Date/Time:</dt>
-								    <dd class="dib ml0 white-70">2021-03-29 18:26:00 GMT</dd><!--ISO 8601 + locale system time-->
-								  </dl>
+									    <dt class="dib light-gray b">ip:</dt>
+									    <dd class="dib ml0 white-70 match-ip">127.0.0.1</dd>
+									</dl>
 									<dl class="lh-title mv2">
-								    <dt class="dib light-gray b">N&deg; Players:</dt>
-								    <dd class="dib ml0 white-70">32 / 32</dd>
-								  </dl>
-
+									    <dt class="dib light-gray b">Kills:</dt>
+									    <dd class="dib ml0 white-70 match-kills">123</dd>
+									</dl>
+									<dl class="lh-title mv2">
+									    <dt class="dib light-gray b">Deaths:</dt>
+									    <dd class="dib ml0 white-70 match-deaths">123</dd>
+									</dl>
+									<dl class="lh-title mv2">
+									    <dt class="dib light-gray b">N&deg; players:</dt>
+									    <dd class="dib ml0 white-70 match-players">32 / 32</dd>
+									</dl>
 									<a class="bn link f6 br2 ph3-ns pv2 ph4 mb2 mb0-ns dib white b bg-dark-red" href="map.html">Match info</a>
-
 								</div>
 							</div>
-						</div>
+						</li>
+					</ul>
 
-					</div>
 				</div>
+
 			</div>
+
 
 
   		<footer class="bg-dark-gray white-80 pv4 ph5">
@@ -74,6 +239,6 @@
   				</div>
   			</div>
   		</footer>
-  	<script src="fun.js" charset="utf-8"></script>
+  	<script src="/js/fun.js" charset="utf-8"></script>
   </body>
 </html>

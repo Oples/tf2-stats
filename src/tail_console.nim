@@ -24,13 +24,13 @@ type
         owner*: string
         fileCursor: int64
         players: int
-        max_players: int
+        maxPlayers: int
         build: string
         server_num: string
-        server_ip: string
+        serverIp: string
         mm_id: string
         n_friends: int
-        tf2*: Game
+        game*: Game
         match*: Match
         connecting: int
         map*: string
@@ -53,13 +53,13 @@ proc newTF2ConsoleLogger*(): TF2ConsoleLogger =
     result.owner = "" # YOUR NAME HERE!!! or blank for auto
     result.fileCursor = (int64) 0
     result.players = 0
-    result.max_players = 0
+    result.maxPlayers = 0
     result.build = ""
     result.server_num = ""
-    result.server_ip = ""
+    result.serverIp = ""
     result.mm_id = ""
     result.n_friends = 0
-    result.tf2 = newGame()
+    result.game = newGame()
     result.match = newMatch()
     # Connecting
     result.connecting = 0
@@ -101,38 +101,44 @@ proc newTF2ConsoleLogger*(): TF2ConsoleLogger =
 
 
 method `$`*(self: TF2ConsoleLogger): string {.base.} =
-    result = &"ip {self.server_ip}, map {self.map}"
+    result = &"ip {self.serverIp}, map {self.map}"
 
 
-method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
+method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
     var m: RegexMatch
 
     # don't even bother (usually spam bots send empty lines)
     if line == "":
         discard
 
+
     # Connecting to server
     elif line.match(re"^Connecting to (.*?)(?:\.\.\.){0,1}$", m):
-        self.server_ip = m.groupFirstCapture(0, line)
-        logger.log(lvlInfo, "CONNECTING TO: ", self.server_ip)
+        self.serverIp = m.groupFirstCapture(0, line)
+        logger.log(lvlInfo, "CONNECTING TO: ", self.serverIp)
         self.n_friends = 0
+
 
     elif line == "Team Fortress":
         self.connecting = 1
         logger.log(lvlInfo, "New server connecting...")
 
+
     elif self.connecting == 1 and line.match(re"Map: (.*)", m):
         self.connecting += 1
         self.map = m.groupFirstCapture(0, line)
 
+
     elif self.connecting == 2 and line.match(re"Players: ([0-9]+) / ([0-9]+)", m):
         self.connecting += 1
         #tf2.players = parseInt(m.groupFirstCapture(0, line))
-        self.tf2.currentMatch().maxPlayers = parseInt(m.groupFirstCapture(1, line))
+        self.game.currentMatch().maxPlayers = parseInt(m.groupFirstCapture(1, line))
+
 
     elif self.connecting == 3 and line.match(re"Build: ([0-9]+)", m):
         self.connecting += 1
         self.build = m.groupFirstCapture(0, line)
+
 
     elif self.connecting == 4 and line.match(re"Server Number: ([0-9]+)", m):
         self.connecting += 1
@@ -143,15 +149,17 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
 
         #if match != cast[Match](nil):
         #    saveJSON(match.toJson(), "match" & $len(tf2.match) & ".json")
-        self.match = self.tf2.newMatch(self.server_ip, self.map)
+        self.match = self.game.newMatch(self.serverIp, self.map)
         self.matchStart = true
 
         {.gcsafe.}:
             self.onConnectingServer(self)
 
-    elif self.tf2.match.len < 1:
+
+    elif self.game.match.len < 1:
         # no match was started
         return
+
 
     elif line.match(re"^(.*) connected$", m):
         var p = self.match.addPlayer(m.groupFirstCapture(0, line))
@@ -165,6 +173,7 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
             self.owner = m.groupFirstCapture(0, line)
             logger.log(lvlNotice, self.owner," IS NOW MY OWNER")
             self.matchStart = false
+
 
     # A kill to record
     elif line.match(re"^(.*) killed (.*) with (.*?)\.( \(crit\))*$", m):
@@ -193,13 +202,17 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         #    OWNER_deaths += 1
         #    logger.log(lvlInfo, OWNER, " deaths total: ", OWNER_deaths)
 
-    # sucide doesn't solve anything
+        # I added this so I can be even more angry
+        #if aName == self.owner:
+        #    OWNER_kills += 1
+
+    # suicide doesn't solve anything
     elif line.match(re"^(.*) suicided.$", m) or line.match(re"^(.*) died.$", m):
         let sName = m.groupFirstCapture(0, line)
         logger.log(lvlInfo, sName, " called for Valhalla.")
-
         #if self.owner == sName:
         #    OWNER_deaths += 1
+
 
     # a class was selected
     elif line.match(re"(.*) selected", m):
@@ -224,8 +237,10 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
     elif line.match(re"^(?:.*[SM].*? ){0,1}(.*) was moved to the other team for game balance$", m):
         let pName = m.groupFirstCapture(0, line)
         var player = self.match.addPlayer(pName)
-        player.switchSide()
+
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
         logger.log(lvlDebug, pName , " team balance")
+
 
     # Team Balance
     elif line.match(re"^(?:.*[SM].*? ){0,1}(.*) has been changed to (.*) to balance the teams.$", m):
@@ -233,7 +248,7 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         let team = m.groupFirstCapture(2, line)
         var player = self.match.addPlayer(pName)
 
-        player.switchSide()
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
 
         if team == "RED":
             player.team = 1
@@ -245,12 +260,14 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         discard player.propagateTeams()
         logger.log(lvlDebug, pName , " joined the team ", team)
 
+
     # Team Balance
     elif line.match(re"^(?:.*[SM].*? ){0,1}(.*) was moved to the other team for game balance$", m):
         let pName = m.groupFirstCapture(0, line)
         var player = self.match.addPlayer(pName)
-        player.switchSide()
+        self.match.addTeamSwitch(player.switchSide(teamBalance = true))
         logger.log(lvlDebug, pName, " team balance")
+
 
     # CHAT
     elif line.match(re"^\*DEAD\*\(TEAM\) (.*?) :  (.*)$", m):
@@ -263,6 +280,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug, "r.i.p. (team) message")
         logger.log(lvlDebug, "Player: ", pName)
         logger.log(lvlDebug, "Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     elif line.match(re"^\*DEAD\* (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -274,6 +294,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug, "r.i.p. message")
         logger.log(lvlDebug, "Player: ", pName)
         logger.log(lvlDebug, "Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     elif line.match(re"^\(TEAM\) (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -285,6 +308,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         logger.log(lvlDebug,"team message")
         logger.log(lvlDebug,"Player: ", pName)
         logger.log(lvlDebug,"Text: ", message)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     elif line.match(re"^\*SPEC\* (.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -293,6 +319,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         var msg : Chat = newMsg( true, false, false, message, say_player)
         logger.log(lvlInfo, line)
         self.match.addMsg(msg)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     elif line.match(re"^(.*?) :  (.*)$", m):
         let pName = m.groupFirstCapture(0, line)
@@ -301,6 +330,9 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         var msg : Chat = newMsg( false, true, false, message, say_player)
         logger.log(lvlInfo, line)
         self.match.addMsg(msg)
+        {.gcsafe.}:
+            self.onChatMessage(self, msg)
+
 
     # Spagetti Code to find how many parties I have to throw
     # 70% of the time it's wrong BE CAREFUL OF THIS INFO
@@ -308,18 +340,20 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         self.n_friends += 1
         logger.log(lvlDebug, "FRIENDS N: ", self.n_friends)
 
+
     # 3 types of match end or disconnect
     # why?
     elif line == "Sending request to abandon current match":
         logger.log(lvlInfo, "MATCH END #1")
 
+
     elif line == "Disconnecting from abandoned match server":
         logger.log(lvlInfo, "MATCH END #2")
 
+
     elif line == "Sending request to exit matchmaking, marking assigned match as ended":
         logger.log(lvlInfo, "MATCH END #3")
-        #for l in match.log:
-        #    echo $l.toJson()
+
 
     # Capture Point Event
     elif line.match(re"^(.*) defended (.*) for team #([0-9]+){1}$", m) or
@@ -333,10 +367,10 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
         for player_name in players:
             var player = self.match.addPlayer(player_name)
 
-            logger.log(lvlDebug, "team len(player.team_switch) ", len(player.team_switch))
+            logger.log(lvlDebug, "team len(player.teamBalance) ", len(player.teamSwitch))
             #echo "player: ", pretty(player.toJson())
             logger.log(lvlInfo, "PLAYER: ", player.name, " OF TEAM ", player.team," IS:")
-            if not (len(player.team_switch) mod 2 == 0):
+            if not (len(player.teamSwitch) mod 2 == 0):
                 if team == 2:
                     team = 3
                 if team == 3:
@@ -349,15 +383,13 @@ method update_info(self: TF2ConsoleLogger, line: string) {.base.} =
                 player.team = 2
                 logger.log(lvlInfo, "TEAM BLUE")
 
-            logger.log(lvlDebug, "Found a team: propagating..")
+            logger.log(lvlDebug, "Found a team: propagating...")
             discard player.propagateTeams()
 
     # Garbage: Ignore this line
     else:
-        logger.log(lvlDebug, "-- IGNORED LINE")
+        #logger.log(lvlDebug, "-- IGNORED LINE")
         return
-
-    # Update the channel
 
 
 method runWatchdog*(self: TF2ConsoleLogger, filePath: string) {.base.} =
@@ -406,7 +438,7 @@ method runWatchdog*(self: TF2ConsoleLogger, filePath: string) {.base.} =
                 #logger.log(lvlDebug, line)
                 {.gcsafe.}:
                     self.onNewLine(self, line)
-                self.update_info(line)
+                self.updateInfo(line)
                 {.gcsafe.}:
                     self.afterNewLine(self, line)
 
@@ -427,7 +459,7 @@ when isMainModule:
     #echo "Where: ", getAppFilename()
     echo ""
 
-    var TF2LogFilename = "console.log"
+    #var TF2LogFilename = "test/console.log"
     var filePath = ""
 
     when declared(commandLineParams):

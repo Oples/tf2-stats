@@ -21,6 +21,7 @@ type
         weapon: Weapon
         crit: bool
 
+
 proc newKill*(
         subject : Player,
         subject_side : bool,
@@ -41,35 +42,23 @@ proc newKill*(
 
 
 method toJson*(self: Kill): JsonNode {.base.} =
+    ## **Json sample**
     ##```json
     ##{
-    ##  "time": "",
-    ##  "actor": {
-    ##    "name" : "Op",
-    ##    "altSide" : false,
-    ##    "weapon" : "boom",
-    ##    "crit" : true
-    ##  },
-    ##  "target": {
-    ##    "name" : "Op",
-    ##    "altSide" : true
-    ##  }
+    ##  "actor": "Laykeen",
+    ##  "weapon" : "quake_rl",
+    ##  "crit" : true,
+    ##  "target": "Oples"
     ##}
     ##```
+    ## Ouch! :D
     var json_node = newJObject()
-    #json_node.add("time", newJString($self.time.utc))
-
-    var actor = newJObject()
-    actor.add("name", newJString(self.subject.name))
-    actor.add("altSide", newJBool(self.subject_side))
-    actor.add("weapon", newJString(self.weapon.name))
-    actor.add("crit", newJBool(self.crit))
-
-    var target = newJObject()
-    target.add("name", newJString(self.target.name))
-    target.add("altSide", newJBool(self.target_side))
-
-    json_node.add("actor", actor)
-    json_node.add("target", actor)
+    #json_node.add("time", newJString($self.time.utc)) # TODO: needs ORM implementation
+    json_node.add("actor", newJString(self.subject.name))
+    #json_node.add("actorAltSide", newJBool(self.subject_side)) # backend info
+    json_node.add("weapon", newJString(self.weapon.name))
+    json_node.add("crit", newJBool(self.crit))
+    json_node.add("target", newJString(self.target.name))
+    #json_node.add("targetAltSide", newJBool(self.target_side)) # backend info
 
     return json_node
