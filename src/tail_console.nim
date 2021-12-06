@@ -385,7 +385,7 @@ method updateInfo(self: TF2ConsoleLogger, line: string) {.base.} =
 
     # Garbage: Ignore this line
     else:
-        logger.log(lvlDebug, "-- IGNORED LINE")
+        #logger.log(lvlDebug, "-- IGNORED LINE")
         return
 
 
