@@ -26,7 +26,7 @@
 		toastr.options = {
 		  "closeButton": true,
 		  "debug": false,
-		  "newestOnTop": true,
+		  "newestOnTop": false,
 		  "progressBar": true,
 		  "positionClass": "toast-top-right",
 		  "preventDuplicates": false,
@@ -41,51 +41,29 @@
 		  "hideMethod": "fadeOut"
 		}
 
-	    let socketm = new WebSocket("ws://" + window.location.host + "/hookMatchWS");
+	    let socketm = new WebSocket("ws://" + window.location.host + "/updateWS");
 	    //var out = document.getElementById("consoleOut");
 	    socketm.onmessage = function (evt) {
 			try {
-				let buffer = JSON.parse(evt.data).update;
-				//console.log();
-				for (i in buffer) {
-					toastr.clear();
-	   				toastr.info("Map: " + buffer[i].map);
-	   			}
-			} catch (e) {
-				console.error(e);
-			}
-	   		toastr.success("NEW MATCH!");
-	    }
-
-	    let socketc = new WebSocket("ws://" + window.location.host + "/hookChatWS");
-	    socketc.onmessage = function (evt) {
-			try {
-				let buffer = JSON.parse(evt.data).update;
-				//console.log();
-				for (i in buffer) {
-	   				toastr.success(buffer[i].player + ": " + buffer[i].text);
-	   			}
-			} catch (e) {
-				console.error(evt.data);
-				console.error(e);
-			}
-	    }
-
-		let socketk = new WebSocket("ws://" + window.location.host + "/hookKillWS");
-		socketk.onmessage = function (evt) {
-			try {
-				let buffer = JSON.parse(evt.data).update;
-				for (i in buffer) {
-					console.log(buffer[i].actor + " killed " + buffer[i].target);
-					console.log(buffer[i]);
-					toastr.warning(buffer[i].actor + " killed " + buffer[i].target);
+				let allUpdates = JSON.parse(evt.data);
+				if(allUpdates.hasOwnProperty("new")) {
+					console.log(allUpdates);
+					let newUpdate = allUpdates.new;
+					if(newUpdate.type === "map") {
+						toastr.clear();
+						toastr.success("NEW MATCH!");
+						toastr.info("Map: " + newUpdate.data.name);
+					} else if (newUpdate.type === "kill") {
+						toastr.warning("Kill: " + newUpdate.data.target);
+					} else if (newUpdate.type === "chat") {
+						toastr.success(newUpdate.data.player + ": " + newUpdate.data.text);
+					}
 				}
 			} catch (e) {
-				console.error(evt.data);
 				console.error(e);
 			}
-			//toastr.success("A KILL!");
-		}
+	   		//
+	    }
 	    </script>
 	</head>
 
